@@ -13,6 +13,8 @@ export type StateDict = {
   mlp_fc2: number[][];
 };
 
+type ParamRef = [number[], number]; // [row_ref, col_index]
+
 // Initialize a vocabSize x vocabSize state dictionary with empty counts
 export function initStateDict(vocabSize: number): StateDict {
   return {
@@ -20,6 +22,12 @@ export function initStateDict(vocabSize: number): StateDict {
     mlp_fc1: gaussianMatrix(4 * N_EMBD, N_EMBD),
     mlp_fc2: gaussianMatrix(vocabSize, 4 * N_EMBD),
   };
+}
+
+export function getParamRefs(stateDict: StateDict): ParamRef[] {
+  return Object.values(stateDict).flatMap((mat) =>
+    mat.flatMap((row) => row.map((_, j) => [row, j] as ParamRef)),
+  );
 }
 
 // Linear transformation: w * x
@@ -62,21 +70,17 @@ export function forward(stateDict: StateDict, tokens: number[]): number {
 // Simple but computationally inefficient
 export function numericalGradient(
   stateDict: StateDict,
+  paramRefs: ParamRef[],
   tokens: number[],
 ): { loss: number; grad: number[] } {
   const loss = forward(stateDict, tokens);
-  const grad: number[] = [];
-  for (const mat of Object.values(stateDict)) {
-    for (const row of mat) {
-      for (let j = 0; j < row.length; j++) {
-        const old = row[j];
-        row[j] = old + EPS;
-        const lossPlus = forward(stateDict, tokens);
-        row[j] = old;
-        grad.push((lossPlus - loss) / EPS);
-      }
-    }
-  }
+  const grad: number[] = paramRefs.map(([row, j]) => {
+    const old = row[j];
+    row[j] = old + EPS;
+    const lossPlus = forward(stateDict, tokens);
+    row[j] = old;
+    return (lossPlus - loss) / EPS;
+  });
   return { loss, grad };
 }
 
