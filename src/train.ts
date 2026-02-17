@@ -1,11 +1,11 @@
 import type { Tokenizer } from './data';
 import { type StateDict, bigram } from './model';
 
-export function train(stateDict: StateDict, docs: string[], tokenizer: Tokenizer, numSteps = 1000) {
+export function train(stateDict: StateDict, docs: string[], tokenizer: Tokenizer, numSteps: number) {
   for (let step = 0; step < numSteps; step++) {
     const doc = docs[step % docs.length];
     const tokens = tokenizer.encode(doc);
-    
+
     // Compute losses for each token
     const losses = tokens.slice(0, -1).map((tokenId, posId) => {
       const targetId = tokens[posId + 1];
