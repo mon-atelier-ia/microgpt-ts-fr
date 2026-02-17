@@ -1,5 +1,5 @@
 import type { Tokenizer } from "./data";
-import { getParamRefs, numericalGradient, type StateDict } from "./model";
+import { analyticGradient, getParamRefs, type StateDict } from "./model";
 
 export function train(
   stateDict: StateDict,
@@ -13,7 +13,7 @@ export function train(
     const doc = docs[step % docs.length];
     const tokens = tokenizer.encode(doc);
 
-    const { loss, grad } = numericalGradient(stateDict, paramRefs, tokens);
+    const { loss, grad } = analyticGradient(stateDict, tokens);
 
     // SGD update
     const lrT = learningRate * (1 - step / numSteps); // linear learning rate decay
