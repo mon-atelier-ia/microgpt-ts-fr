@@ -6,7 +6,12 @@
     "start": "tsx main.ts"
   },
   "devDependencies": {
+    "@types/lodash": "^4.17.23",
+    "@types/node": "^25.2.3",
     "tsx": "^4.19.0",
     "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.23"
   }
 }
