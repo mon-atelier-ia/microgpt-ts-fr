@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import shuffle from 'lodash/shuffle';
+import { shuffle } from './utils';
 
 const DATASET_URL = 'https://raw.githubusercontent.com/karpathy/makemore/refs/heads/master/names.txt';
 const INPUT_PATH = './tmp/input.txt';
@@ -43,8 +43,8 @@ export async function loadDocuments(): Promise<string[]> {
   const docs = text
     .trim()
     .split('\n')
-    .map((l: string) => l.trim())
-    .filter((l: string) => l.length > 0);
+    .map((line: string) => line.trim())
+    .filter((line: string) => line.length > 0);
 
   const shuffled = shuffle(docs);
 
