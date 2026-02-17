@@ -1,7 +1,7 @@
 // Single-layer MLP, trained with autograd
 import type { Tokenizer } from "./data";
 import { gaussianMatrix, mean, sample, sum } from "./utils";
-import { Value } from "./value";
+import type { Value } from "./value";
 
 const MAX_OUTPUT_LENGTH = 16;
 const N_EMBD = 16;

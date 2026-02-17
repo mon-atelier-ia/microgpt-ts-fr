@@ -22,8 +22,7 @@ export function train(
     // SGD update
     const lrT = learningRate * (1 - step / numSteps);
     params.forEach((param) => {
-      param.data -= lrT * param.grad;
-      param.grad = 0; // reset gradient
+      param.applyGradient(lrT);
     });
 
     if (step < 5 || step % 200 === 0) {

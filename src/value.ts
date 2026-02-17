@@ -52,7 +52,7 @@ export class Value {
     return this.mul(o.pow(-1));
   }
 
-  backward(): void {
+  backward() {
     const topo: Value[] = [];
     const visited = new Set<Value>();
     const buildTopo = (v: Value) => {
@@ -68,5 +68,10 @@ export class Value {
         v._children[i].grad += v._localGrads[i] * v.grad;
       }
     }
+  }
+
+  applyGradient(lr: number) {
+    this.data -= lr * this.grad;
+    this.grad = 0; // reset gradient
   }
 }
