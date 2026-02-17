@@ -1,9 +1,10 @@
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
-import { shuffle } from './utils';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
+import { shuffle } from "./utils";
 
-const DATASET_URL = 'https://raw.githubusercontent.com/karpathy/makemore/refs/heads/master/names.txt';
-const INPUT_PATH = './tmp/input.txt';
+const DATASET_URL =
+  "https://raw.githubusercontent.com/karpathy/makemore/refs/heads/master/names.txt";
+const INPUT_PATH = "./tmp/input.txt";
 
 export type Tokenizer = {
   vocabSize: number;
@@ -11,10 +12,10 @@ export type Tokenizer = {
   encode: (doc: string) => number[];
   decode: (tokens: number[]) => string;
   chars: string[];
-}
+};
 
 export function buildTokenizer(docs: string[]): Tokenizer {
-  const chars = [...new Set(docs.join(''))].sort();
+  const chars = [...new Set(docs.join(""))].sort();
   const BOS = chars.length;
   const vocabSize = chars.length + 1;
 
@@ -23,9 +24,7 @@ export function buildTokenizer(docs: string[]): Tokenizer {
   };
 
   const decode = (tokens: number[]): string => {
-    return tokens
-      .map((t) => t !== BOS ? chars[t] : '' )
-      .join('');
+    return tokens.map((t) => (t !== BOS ? chars[t] : "")).join("");
   };
 
   return { vocabSize, BOS, encode, decode, chars };
@@ -39,10 +38,10 @@ export async function loadDocuments(): Promise<string[]> {
     writeFileSync(INPUT_PATH, text);
   }
 
-  const text = readFileSync(INPUT_PATH, 'utf-8');
+  const text = readFileSync(INPUT_PATH, "utf-8");
   const docs = text
     .trim()
-    .split('\n')
+    .split("\n")
     .map((line: string) => line.trim())
     .filter((line: string) => line.length > 0);
 

@@ -1,6 +1,6 @@
 // Bigram language model: state_dict[i][j] = how many times token j follows token i
-import type { Tokenizer } from './data';
-import { sample, sum } from './utils';
+import type { Tokenizer } from "./data";
+import { sample, sum } from "./utils";
 
 const MAX_OUTPUT_LENGTH = 16;
 export type StateDict = number[][];
@@ -20,7 +20,11 @@ export function bigram(stateDict: StateDict, tokenId: number): number[] {
 }
 
 // Generate new samples by sampling from the model
-export function inference(stateDict: StateDict, tokenizer: Tokenizer, nSamples: number) {
+export function inference(
+  stateDict: StateDict,
+  tokenizer: Tokenizer,
+  nSamples: number,
+) {
   console.log("\n--- inference (new, hallucinated names) ---");
   const { BOS, decode } = tokenizer;
   for (let i = 0; i < nSamples; i++) {

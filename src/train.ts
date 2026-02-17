@@ -1,8 +1,13 @@
-import type { Tokenizer } from './data';
-import { type StateDict, bigram } from './model';
-import { mean } from './utils';
+import type { Tokenizer } from "./data";
+import { bigram, type StateDict } from "./model";
+import { mean } from "./utils";
 
-export function train(stateDict: StateDict, docs: string[], tokenizer: Tokenizer, numSteps: number) {
+export function train(
+  stateDict: StateDict,
+  docs: string[],
+  tokenizer: Tokenizer,
+  numSteps: number,
+) {
   for (let step = 0; step < numSteps; step++) {
     const doc = docs[step % docs.length];
     const tokens = tokenizer.encode(doc);
@@ -21,6 +26,8 @@ export function train(stateDict: StateDict, docs: string[], tokenizer: Tokenizer
       stateDict[tokenId][targetId] += 1;
     });
 
-    console.log(`step ${String(step + 1).padStart(4)} / ${String(numSteps).padStart(4)} | loss ${loss.toFixed(4)}`);
+    console.log(
+      `step ${String(step + 1).padStart(4)} / ${String(numSteps).padStart(4)} | loss ${loss.toFixed(4)}`,
+    );
   }
 }
