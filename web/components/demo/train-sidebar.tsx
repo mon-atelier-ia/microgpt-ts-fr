@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -19,8 +20,13 @@ type TrainSidebarProps = {
   modelConfig: ModelConfig;
   trainingConfig: TrainingConfig;
   disabled: boolean;
+  isTraining: boolean;
+  isTrained: boolean;
   onModelChange: (c: ModelConfig) => void;
   onTrainingChange: (c: TrainingConfig) => void;
+  onTrain: () => void;
+  onStop: () => void;
+  onSwitchToGenerate: () => void;
 };
 
 const LR_MIN = 0.001;
@@ -82,8 +88,13 @@ export function TrainSidebar({
   modelConfig,
   trainingConfig,
   disabled,
+  isTraining,
+  isTrained,
   onModelChange,
   onTrainingChange,
+  onTrain,
+  onStop,
+  onSwitchToGenerate,
 }: TrainSidebarProps) {
   return (
     <div className="flex w-48 shrink-0 flex-col gap-5">
@@ -177,6 +188,27 @@ export function TrainSidebar({
             className="w-full"
           />
         </div>
+      </div>
+
+      <div className="mt-auto flex flex-col gap-2 pt-4">
+        {isTraining ? (
+          <Button variant="outline" onClick={onStop} className="w-full">
+            Stop
+          </Button>
+        ) : (
+          <Button onClick={onTrain} className="w-full">
+            {isTrained ? "Re-train" : "Train"}
+          </Button>
+        )}
+        {isTrained && (
+          <Button
+            variant="outline"
+            onClick={onSwitchToGenerate}
+            className="w-full"
+          >
+            Generate &rarr;
+          </Button>
+        )}
       </div>
     </div>
   );

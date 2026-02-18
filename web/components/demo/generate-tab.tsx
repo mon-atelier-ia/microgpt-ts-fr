@@ -6,12 +6,10 @@ type Status = "idle" | "training" | "trained";
 export function GenerateTab({
   status,
   output,
-  onGenerate,
   onSwitchToTrain,
 }: {
   status: Status;
   output: string[];
-  onGenerate: () => void;
   onSwitchToTrain: () => void;
 }) {
   if (status !== "trained") {
@@ -29,10 +27,6 @@ export function GenerateTab({
 
   return (
     <div className="flex flex-col gap-5">
-      <Button onClick={onGenerate} className="w-fit">
-        Generate
-      </Button>
-
       {output.length > 0 && (
         <div className="grid grid-cols-2 gap-x-8 gap-y-1.5 rounded-lg border bg-muted/30 p-6 sm:grid-cols-3">
           {output.map((name, i) => (

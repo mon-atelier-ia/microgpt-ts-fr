@@ -211,8 +211,16 @@ export function TrainDemo() {
             modelConfig={modelConfig}
             trainingConfig={trainingConfig}
             disabled={isTraining}
+            isTraining={isTraining}
+            isTrained={isTrained}
             onModelChange={setModelConfig}
             onTrainingChange={setTrainingConfig}
+            onTrain={handleTrain}
+            onStop={handleStop}
+            onSwitchToGenerate={() => {
+              setTab("generate");
+              handleGenerate();
+            }}
           />
         )}
         {tab === "generate" && (
@@ -221,6 +229,7 @@ export function TrainDemo() {
             numSamples={numSamples}
             onTemperatureChange={setTemperature}
             onNumSamplesChange={setNumSamples}
+            onGenerate={handleGenerate}
           />
         )}
 
@@ -246,9 +255,6 @@ export function TrainDemo() {
               trainingConfig={trainingConfig}
               lossHistory={lossHistory}
               liveGenEntries={liveGenEntries}
-              onTrain={handleTrain}
-              onStop={handleStop}
-              onSwitchToGenerate={() => setTab("generate")}
             />
           </TabsContent>
 
@@ -256,7 +262,6 @@ export function TrainDemo() {
             <GenerateTab
               status={status}
               output={output}
-              onGenerate={handleGenerate}
               onSwitchToTrain={() => setTab("train")}
             />
           </TabsContent>

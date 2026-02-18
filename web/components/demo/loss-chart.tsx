@@ -1,11 +1,5 @@
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   type ChartConfig,
   ChartContainer,
@@ -34,28 +28,15 @@ const lossChartConfig = {
 export function LossChart({
   data,
   numSteps,
-  currentLoss,
 }: {
   data: LossPoint[];
   numSteps: number;
-  currentLoss: number;
 }) {
   const display = downsample(data);
   const yMax = data.length > 0 ? Math.ceil(data[0].loss) : 4;
-  const lastStep = data.length > 0 ? data[data.length - 1].step : 0;
   return (
     <Card size="sm">
-      <CardHeader>
-        <CardTitle>Training Loss</CardTitle>
-        <CardDescription>
-          Smoothed loss over {lastStep.toLocaleString()} /{" "}
-          {numSteps.toLocaleString()} steps — current:{" "}
-          <span className="font-mono font-medium text-foreground">
-            {currentLoss.toFixed(4)}
-          </span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         <ChartContainer config={lossChartConfig} className="h-56 w-full">
           <AreaChart data={display} accessibilityLayer>
             <defs>
@@ -85,6 +66,7 @@ export function LossChart({
               }
             />
             <YAxis
+              orientation="right"
               tickLine={false}
               axisLine={false}
               tickMargin={8}

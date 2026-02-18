@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 
@@ -6,6 +7,7 @@ type GenerateSidebarProps = {
   numSamples: number;
   onTemperatureChange: (t: number) => void;
   onNumSamplesChange: (n: number) => void;
+  onGenerate: () => void;
 };
 
 export function GenerateSidebar({
@@ -13,6 +15,7 @@ export function GenerateSidebar({
   numSamples,
   onTemperatureChange,
   onNumSamplesChange,
+  onGenerate,
 }: GenerateSidebarProps) {
   return (
     <div className="flex w-48 shrink-0 flex-col gap-5">
@@ -58,6 +61,12 @@ export function GenerateSidebar({
             className="w-full"
           />
         </div>
+      </div>
+
+      <div className="mt-auto pt-4">
+        <Button onClick={onGenerate} className="w-full">
+          Generate
+        </Button>
       </div>
     </div>
   );
