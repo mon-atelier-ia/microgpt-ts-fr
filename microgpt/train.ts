@@ -1,4 +1,11 @@
-import { forward, getParams, type ModelConfig, DEFAULT_CONFIG, type StateDict, type Tokenizer } from "./model";
+import {
+  DEFAULT_CONFIG,
+  forward,
+  getParams,
+  type ModelConfig,
+  type StateDict,
+  type Tokenizer,
+} from "./model";
 import type { Value } from "./value";
 
 export type AdamConfig = {

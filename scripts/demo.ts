@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import {
-  DEFAULT_CONFIG,
   buildTokenizer,
+  DEFAULT_CONFIG,
   getParams,
   inference,
   initStateDict,

@@ -1,4 +1,10 @@
-import { getParams, type ModelConfig, DEFAULT_CONFIG, type StateDict, type Tokenizer } from "./model";
+import {
+  DEFAULT_CONFIG,
+  getParams,
+  type ModelConfig,
+  type StateDict,
+  type Tokenizer,
+} from "./model";
 import {
   type AdamConfig,
   type AdamState,

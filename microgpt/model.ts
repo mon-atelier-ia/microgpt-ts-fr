@@ -39,7 +39,12 @@ export type ModelConfig = {
   blockSize: number;
 };
 
-export const DEFAULT_CONFIG: ModelConfig = { nEmbd: 16, nHead: 4, nLayer: 1, blockSize: 16 };
+export const DEFAULT_CONFIG: ModelConfig = {
+  nEmbd: 16,
+  nHead: 4,
+  nLayer: 1,
+  blockSize: 16,
+};
 
 export type StateDict = {
   wte: Value[][];
@@ -53,7 +58,10 @@ export type StateDict = {
   lm_head: Value[][];
 };
 
-export function initStateDict(vocabSize: number, config: ModelConfig = DEFAULT_CONFIG): StateDict {
+export function initStateDict(
+  vocabSize: number,
+  config: ModelConfig = DEFAULT_CONFIG,
+): StateDict {
   const { nEmbd, nLayer, blockSize } = config;
   return {
     wte: gaussianMatrix(vocabSize, nEmbd),
@@ -167,7 +175,11 @@ function gpt(
 }
 
 // Forward pass: run the model on a token sequence, return the average loss
-export function forward(stateDict: StateDict, tokens: number[], config: ModelConfig = DEFAULT_CONFIG): Value {
+export function forward(
+  stateDict: StateDict,
+  tokens: number[],
+  config: ModelConfig = DEFAULT_CONFIG,
+): Value {
   const n = Math.min(config.blockSize, tokens.length - 1);
   const keys: Value[][][] = init2dList(config.nLayer);
   const values: Value[][][] = init2dList(config.nLayer);
@@ -183,7 +195,12 @@ export function forward(stateDict: StateDict, tokens: number[], config: ModelCon
 }
 
 // Generate a single sample string from the model
-export function inference(stateDict: StateDict, tokenizer: Tokenizer, temperature = 0.5, config: ModelConfig = DEFAULT_CONFIG): string {
+export function inference(
+  stateDict: StateDict,
+  tokenizer: Tokenizer,
+  temperature = 0.5,
+  config: ModelConfig = DEFAULT_CONFIG,
+): string {
   const { BOS, decode } = tokenizer;
   let tokenId = BOS;
   const tokens: number[] = [];
@@ -192,7 +209,10 @@ export function inference(stateDict: StateDict, tokenizer: Tokenizer, temperatur
   for (let posId = 0; posId < config.blockSize; posId++) {
     const logits = gpt(stateDict, tokenId, posId, keys, values, config);
     if (temperature === 0) {
-      tokenId = logits.reduce((best, l, i, arr) => l.data > arr[best].data ? i : best, 0);
+      tokenId = logits.reduce(
+        (best, l, i, arr) => (l.data > arr[best].data ? i : best),
+        0,
+      );
     } else {
       const probs = softmax(logits.map((l) => l.div(temperature)));
       tokenId = sample(probs.map((p) => p.data));
