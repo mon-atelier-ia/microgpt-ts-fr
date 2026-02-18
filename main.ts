@@ -1,9 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { buildTokenizer, DATASET_URL, parseDocs } from "./src/data";
-import { getParams, inference, initStateDict } from "./src/model";
+import { buildTokenizer, getParams, inference, initStateDict } from "./src/model";
+import { parseDocs } from "./src/utils";
 import { initAdamState, train } from "./src/train";
 
+const DATASET_URL =
+  "https://raw.githubusercontent.com/karpathy/makemore/refs/heads/master/names.txt";
 const INPUT_PATH = "./tmp/input.txt";
 const NUM_SAMPLES = 20;
 const TRAIN_STEPS = 1000;

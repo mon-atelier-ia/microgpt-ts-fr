@@ -1,5 +1,4 @@
-import type { Tokenizer } from "./data";
-import { forward, getParams, type StateDict } from "./model";
+import { forward, getParams, type StateDict, type Tokenizer } from "./model";
 import type { Value } from "./value";
 
 export type AdamConfig = {
