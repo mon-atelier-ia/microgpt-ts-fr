@@ -191,8 +191,12 @@ export function inference(stateDict: StateDict, tokenizer: Tokenizer, temperatur
   const values: Value[][][] = init2dList(config.nLayer);
   for (let posId = 0; posId < config.blockSize; posId++) {
     const logits = gpt(stateDict, tokenId, posId, keys, values, config);
-    const probs = softmax(logits.map((l) => l.div(temperature)));
-    tokenId = sample(probs.map((p) => p.data));
+    if (temperature === 0) {
+      tokenId = logits.reduce((best, l, i, arr) => l.data > arr[best].data ? i : best, 0);
+    } else {
+      const probs = softmax(logits.map((l) => l.div(temperature)));
+      tokenId = sample(probs.map((p) => p.data));
+    }
     if (tokenId === BOS) break;
     tokens.push(tokenId);
   }
