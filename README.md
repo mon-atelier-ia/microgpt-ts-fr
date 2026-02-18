@@ -1,6 +1,6 @@
 # microgpt-ts
 
-A TypeScript port of Andrej Karpathy's [microgpt](https://gist.github.com/karpathy/8627fe009c40f57531cb18360106ce95) — a complete GPT trained from scratch with **zero runtime dependencies**.
+A TypeScript port of Andrej Karpathy's [microgpt](https://gist.github.com/karpathy/8627fe009c40f57531cb18360106ce95) — a complete GPT built from scratch with **zero runtime dependencies**. Supports training and inference.
 
 No PyTorch. No TensorFlow. Just TypeScript, and ~400 lines of code.
 
