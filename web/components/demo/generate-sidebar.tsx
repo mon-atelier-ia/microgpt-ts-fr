@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 type GenerateSidebarProps = {
   temperature: number;
   numSamples: number;
+  isGenerating: boolean;
   onTemperatureChange: (t: number) => void;
   onNumSamplesChange: (n: number) => void;
   onGenerate: () => void;
@@ -13,6 +14,7 @@ type GenerateSidebarProps = {
 export function GenerateSidebar({
   temperature,
   numSamples,
+  isGenerating,
   onTemperatureChange,
   onNumSamplesChange,
   onGenerate,
@@ -64,8 +66,8 @@ export function GenerateSidebar({
       </div>
 
       <div className="mt-auto pt-4">
-        <Button onClick={onGenerate} className="w-full">
-          Generate
+        <Button onClick={onGenerate} disabled={isGenerating} className="w-full">
+          {isGenerating ? "Generating\u2026" : "Generate"}
         </Button>
       </div>
     </div>

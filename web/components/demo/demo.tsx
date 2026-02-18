@@ -33,9 +33,9 @@ import { TrainTab } from "./train-tab";
 // --- Constants ---
 
 const LIVE_GEN_INTERVAL = 100;
-const LIVE_GEN_SAMPLES = 3;
+const LIVE_GEN_SAMPLES = 5;
 const MAX_LIVE_GEN = 15;
-const DEFAULT_NUM_SAMPLES = 10;
+const DEFAULT_NUM_SAMPLES = 20;
 
 // --- Types ---
 
@@ -168,14 +168,33 @@ export function TrainDemo() {
     setStatus("trained");
   }, []);
 
+  const [isGenerating, setIsGenerating] = useState(false);
+  const genAbortRef = useRef<AbortController | null>(null);
+
   const handleGenerate = useCallback(() => {
     if (!modelRef.current) return;
+    genAbortRef.current?.abort();
+    const abort = new AbortController();
+    genAbortRef.current = abort;
+
     const { stateDict, tokenizer, modelConfig: mc } = modelRef.current;
-    const names: string[] = [];
-    for (let i = 0; i < numSamples; i++) {
-      names.push(inference(stateDict, tokenizer, temperature, mc));
-    }
-    setOutput(names);
+    setOutput([]);
+    setIsGenerating(true);
+
+    let i = 0;
+    const tick = () => {
+      if (abort.signal.aborted) return;
+      if (i >= numSamples) {
+        setIsGenerating(false);
+        genAbortRef.current = null;
+        return;
+      }
+      const word = inference(stateDict, tokenizer, temperature, mc);
+      setOutput((prev) => [...prev, word]);
+      i++;
+      setTimeout(tick, 80);
+    };
+    tick();
   }, [temperature, numSamples]);
 
   const isTraining = status === "training";
@@ -227,6 +246,7 @@ export function TrainDemo() {
           <GenerateSidebar
             temperature={temperature}
             numSamples={numSamples}
+            isGenerating={isGenerating}
             onTemperatureChange={setTemperature}
             onNumSamplesChange={setNumSamples}
             onGenerate={handleGenerate}
@@ -258,10 +278,11 @@ export function TrainDemo() {
             />
           </TabsContent>
 
-          <TabsContent value="generate" className="mt-0">
+          <TabsContent value="generate" className="mt-0 flex min-h-0 flex-col">
             <GenerateTab
               status={status}
               output={output}
+              isGenerating={isGenerating}
               onSwitchToTrain={() => setTab("train")}
             />
           </TabsContent>
