@@ -1,14 +1,14 @@
 {
-  "name": "next-app-starter",
+  "name": "microgpt-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
+    "lint": "cd .. && biome check web/",
+    "lint:fix": "cd .. && biome check --write web/",
+    "format": "cd .. && biome format --write web/",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -27,7 +27,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.14",
+    "@biomejs/biome": "^2.4.2",
     "@chromatic-com/storybook": "^5.0.1",
     "@storybook/addon-a11y": "^10.2.8",
     "@storybook/addon-docs": "^10.2.8",
