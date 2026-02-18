@@ -28,6 +28,10 @@ export type StepInfo = {
   lr: number;
 };
 
+export function emaSmooth(prev: number, value: number, step: number, alpha = 0.01): number {
+  return step === 0 ? value : (1 - alpha) * prev + alpha * value;
+}
+
 export const initAdamState = (nParams: number): AdamState => {
   return {
     m: Array.from({ length: nParams }, () => 0),
@@ -95,8 +99,7 @@ export function train(
       modelConfig,
     );
 
-    // Exponential moving average for loss
-    smoothLoss = step === 0 ? info.loss : 0.99 * smoothLoss + 0.01 * info.loss;
+    smoothLoss = emaSmooth(smoothLoss, info.loss, step);
     info.smoothLoss = smoothLoss;
 
     if (onStep) onStep(info);

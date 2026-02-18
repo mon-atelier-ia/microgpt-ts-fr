@@ -9,6 +9,7 @@ import {
   type AdamConfig,
   type AdamState,
   type StepInfo,
+  emaSmooth,
   trainStep,
 } from "./train";
 
@@ -59,8 +60,7 @@ export function trainAsync(
           config,
           modelConfig,
         );
-        smoothLoss =
-          step === 0 ? info.loss : 0.99 * smoothLoss + 0.01 * info.loss;
+        smoothLoss = emaSmooth(smoothLoss, info.loss, step);
         info.smoothLoss = smoothLoss;
         onStep(info);
         step++;
