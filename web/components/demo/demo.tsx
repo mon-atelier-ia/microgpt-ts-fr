@@ -185,9 +185,9 @@ export function TrainDemo() {
     <Tabs
       value={tab}
       onValueChange={(v) => setTab(v as TabId)}
-      className="flex w-full max-w-5xl flex-col"
+      className="flex w-full max-w-5xl flex-1 flex-col min-h-0"
     >
-      <TabsList className="mb-6 w-fit self-start">
+      <TabsList className="mb-6 w-full max-w-md self-center">
         <TabsTrigger value="dataset">Dataset</TabsTrigger>
         <TabsTrigger value="train">Train</TabsTrigger>
         <TabsTrigger value="generate" disabled={!isTrained && !isTraining}>
@@ -195,13 +195,15 @@ export function TrainDemo() {
         </TabsTrigger>
       </TabsList>
 
-      <div className="flex gap-8">
+      <div className="flex flex-1 gap-8 min-h-0">
         {/* Adaptive sidebar */}
         {tab === "dataset" && (
           <DatasetSidebar
             selectedId={selectedPresetId}
             disabled={isTraining}
+            wordCount={wordCount}
             onSelect={setSelectedPresetId}
+            onTrain={handleTrain}
           />
         )}
         {tab === "train" && (
@@ -225,16 +227,13 @@ export function TrainDemo() {
         <Separator orientation="vertical" className="h-auto" />
 
         {/* Main content area */}
-        <div className="min-w-0 flex-1">
-          <TabsContent value="dataset" className="mt-0">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <TabsContent value="dataset" className="mt-0 flex min-h-0 flex-col">
             <DatasetTab
               namesText={namesText}
               customText={customText}
               selectedPresetId={selectedPresetId}
-              wordCount={wordCount}
-              disabled={isTraining}
               onCustomTextChange={setCustomText}
-              onTrain={handleTrain}
             />
           </TabsContent>
 
