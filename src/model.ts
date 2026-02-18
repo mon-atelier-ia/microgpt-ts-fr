@@ -3,7 +3,6 @@ import type { Tokenizer } from "./data";
 import { gaussianMatrix, mean, sample, sum } from "./utils";
 import type { Value } from "./value";
 
-const MAX_OUTPUT_LENGTH = 16;
 const N_EMBD = 16;
 const BLOCK_SIZE = 16;
 const TEMPERATURE = 0.5;
@@ -75,15 +74,6 @@ export function rmsnorm(x: Value[]): Value[] {
   return x.map((xi) => xi.mul(scale));
 }
 
-// MLP model: token_id -> logits
-function mlp(stateDict: StateDict, tokenId: number): Value[] {
-  let x = stateDict.wte[tokenId];
-  x = linear(x, stateDict.mlp_fc1);
-  x = x.map((xi) => xi.relu());
-  const logits = linear(x, stateDict.mlp_fc2);
-  return logits;
-}
-
 function gpt(
   stateDict: StateDict,
   tokenId: number,
@@ -125,12 +115,17 @@ function gpt(
 
 // Forward pass: run the model on a token sequence, return the average loss
 export function forward(stateDict: StateDict, tokens: number[]): Value {
-  const losses = tokens.slice(0, -1).map((tokenId, posId) => {
+  const n = Math.min(BLOCK_SIZE, tokens.length - 1);
+  const keys: Value[][] = [];
+  const values: Value[][] = [];
+  const losses: Value[] = [];
+  for (let posId = 0; posId < n; posId++) {
+    const tokenId = tokens[posId];
     const targetId = tokens[posId + 1];
-    const logits = mlp(stateDict, tokenId);
+    const logits = gpt(stateDict, tokenId, posId, keys, values);
     const probs = softmax(logits);
-    return lossFn(probs[targetId]);
-  });
+    losses.push(lossFn(probs[targetId]));
+  }
   return mean(losses);
 }
 
@@ -145,8 +140,10 @@ export function inference(
   for (let i = 0; i < nSamples; i++) {
     let tokenId = BOS;
     const tokens: number[] = [];
-    for (let j = 0; j < MAX_OUTPUT_LENGTH; j++) {
-      const logits = mlp(stateDict, tokenId);
+    const keys: Value[][] = [];
+    const values: Value[][] = [];
+    for (let posId = 0; posId < BLOCK_SIZE; posId++) {
+      const logits = gpt(stateDict, tokenId, posId, keys, values);
       const probs = softmax(logits.map((l) => l.div(TEMPERATURE)));
       tokenId = sample(probs.map((p) => p.data));
       if (tokenId === BOS) break;
