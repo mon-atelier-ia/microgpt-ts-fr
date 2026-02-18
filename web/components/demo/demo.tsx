@@ -1,34 +1,9 @@
 "use client";
 
-import type { LucideIcon } from "lucide-react";
-import { Baby, Gem, Globe, PenLine, Wine, Zap } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  type ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { type TrainHandle, trainAsync } from "../../../microgpt/browser";
@@ -48,959 +23,29 @@ import {
   initAdamState,
 } from "../../../microgpt/train";
 import { parseDocs } from "../../../microgpt/utils";
+import { DatasetSidebar } from "./dataset-sidebar";
+import { GenerateSidebar } from "./generate-sidebar";
+import { type LiveGenEntry, LiveGenStream } from "./live-gen-stream";
+import { LossChart, type LossPoint } from "./loss-chart";
+import { CUSTOM_PRESET_ID, PRESETS } from "./presets";
+import { type TrainingConfig, TrainSidebar } from "./train-sidebar";
 
-// --- Preset datasets ---
+// --- Constants ---
 
-type Preset = {
-  id: string;
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  examples: [string, string, string];
-  words: string;
-};
-
-const PRESET_BABY_NAMES = `emma
-olivia
-ava
-sophia
-isabella
-mia
-charlotte
-amelia
-harper
-evelyn
-abigail
-emily
-elizabeth
-avery
-ella
-scarlett
-grace
-chloe
-victoria
-riley
-aria
-lily
-aurora
-zoey
-penelope
-nora
-camila
-elena
-maya
-luna
-savannah
-willow
-hazel
-stella
-ellie
-claire
-violet
-paisley
-skylar
-isla
-madelyn
-naomi
-hannah
-brooklyn
-aaliyah
-bella
-lucy
-anna
-leah
-natalie`;
-
-const PRESET_POKEMON = `pikachu
-bulbasaur
-charmander
-squirtle
-eevee
-gengar
-mewtwo
-charizard
-blastoise
-venusaur
-snorlax
-gyarados
-dragonite
-lapras
-jigglypuff
-clefairy
-vulpix
-ninetales
-psyduck
-golduck
-machamp
-alakazam
-abra
-haunter
-gastly
-onix
-raichu
-sandslash
-nidorina
-nidoking
-wigglytuff
-zubat
-golbat
-oddish
-vileplume
-diglett
-meowth
-persian
-mankey
-primeape
-growlithe
-arcanine
-poliwag
-kadabra
-geodude
-graveler
-golem
-ponyta
-rapidash
-slowpoke
-magnemite
-doduo
-seel
-grimer
-shellder
-cloyster
-drowzee
-hypno
-krabby
-voltorb
-electrode
-exeggcute
-cubone
-hitmonlee
-hitmonchan
-lickitung
-koffing
-weezing
-rhyhorn
-chansey
-kangaskhan
-scyther
-electabuzz
-magmar
-pinsir
-tauros
-magikarp
-ditto
-porygon
-omanyte
-omastar
-kabuto
-aerodactyl
-articuno
-zapdos
-moltres
-dratini
-dragonair
-mew`;
-
-const PRESET_COCKTAILS = `mojito
-negroni
-cosmopolitan
-martini
-margarita
-daiquiri
-sidecar
-gimlet
-sazerac
-manhattan
-bellini
-caipirinha
-zombie
-hurricane
-bramble
-spritz
-americano
-stinger
-sangria
-mimosa
-fizz
-smash
-julep
-cobbler
-swizzle
-rickey
-toddy
-sling
-highball
-mudslide
-aperol
-campari
-fernet
-amaretto
-sambuca
-absinthe
-calvados
-bourbon
-tequila
-mezcal
-pisco
-cognac
-armagnac
-vermouth
-drambuie
-kahlua
-cointreau
-chartreuse
-benedictine
-midori
-frangelico
-chambord
-disaronno
-malibu
-galliano
-limoncello
-grappa
-pastis
-baileys
-cynar
-lillet`;
-
-const PRESET_MINERALS = `quartz
-amethyst
-diamond
-emerald
-sapphire
-ruby
-topaz
-opal
-garnet
-tourmaline
-beryl
-aquamarine
-turquoise
-malachite
-obsidian
-onyx
-jasper
-agate
-carnelian
-citrine
-peridot
-spinel
-alexandrite
-kunzite
-tanzanite
-zircon
-pyrite
-hematite
-fluorite
-calcite
-gypsum
-celestite
-amazonite
-rhodonite
-labradorite
-sodalite
-diopside
-actinolite
-talc
-kyanite
-sillimanite
-staurolite
-epidote
-zoisite
-titanite
-apatite
-cassiterite
-sphalerite
-galena
-cinnabar
-marcasite
-covellite
-barite
-anhydrite
-magnetite
-chromite
-cordierite
-iolite
-wollastonite
-chalcedony`;
-
-const PRESET_COUNTRIES = `albania
-algeria
-argentina
-armenia
-australia
-austria
-azerbaijan
-bahamas
-bangladesh
-barbados
-belarus
-belgium
-belize
-benin
-bhutan
-bolivia
-botswana
-brazil
-brunei
-bulgaria
-cameroon
-canada
-chile
-colombia
-croatia
-cuba
-cyprus
-denmark
-ecuador
-egypt
-eritrea
-estonia
-ethiopia
-fiji
-finland
-france
-gabon
-gambia
-georgia
-germany
-ghana
-greece
-grenada
-guatemala
-guyana
-haiti
-honduras
-hungary
-iceland
-india
-indonesia
-iran
-ireland
-israel
-italy
-jamaica
-japan
-jordan
-kazakhstan
-kenya
-kiribati
-kuwait
-laos
-latvia
-lebanon
-lesotho
-liberia
-luxembourg
-madagascar
-malawi
-malaysia
-mali
-malta
-mauritania
-mauritius
-mexico
-moldova
-monaco
-mongolia
-montenegro
-morocco
-mozambique
-myanmar
-namibia
-nauru
-nepal
-nicaragua
-nigeria
-norway
-oman
-pakistan
-panama
-paraguay
-peru
-philippines
-poland
-portugal
-qatar
-romania
-russia
-rwanda
-samoa
-senegal
-serbia
-seychelles
-singapore
-slovakia
-slovenia
-somalia
-spain
-sweden
-switzerland
-tajikistan
-tanzania
-thailand
-tonga
-tunisia
-turkey
-tuvalu
-uganda
-ukraine
-uruguay
-uzbekistan
-vanuatu
-venezuela
-vietnam
-yemen
-zambia
-zimbabwe`;
-
-const PRESETS: Preset[] = [
-  {
-    id: "baby-names",
-    title: "Baby Names",
-    description: "Soft vowels and flowing endings",
-    icon: Baby,
-    examples: ["aurora", "luna", "aria"],
-    words: PRESET_BABY_NAMES,
-  },
-  {
-    id: "pokemon",
-    title: "Pokémon",
-    description: "Punchy sounds and iconic suffixes",
-    icon: Zap,
-    examples: ["pikachu", "gengar", "eevee"],
-    words: PRESET_POKEMON,
-  },
-  {
-    id: "cocktails",
-    title: "Cocktails",
-    description: "Exotic letters and spirited flair",
-    icon: Wine,
-    examples: ["negroni", "gimlet", "sazerac"],
-    words: PRESET_COCKTAILS,
-  },
-  {
-    id: "minerals",
-    title: "Minerals",
-    description: "Latinate suffixes and crystalline sounds",
-    icon: Gem,
-    examples: ["zircon", "epidote", "kunzite"],
-    words: PRESET_MINERALS,
-  },
-  {
-    id: "countries",
-    title: "Countries",
-    description: "Diverse origins from every corner of the world",
-    icon: Globe,
-    examples: ["fiji", "tuvalu", "grenada"],
-    words: PRESET_COUNTRIES,
-  },
-];
-
-const CUSTOM_PRESET_ID = "custom";
-
-// --- PresetPicker ---
-
-type PresetPickerProps = {
-  selectedId: string;
-  customText: string;
-  disabled: boolean;
-  onSelect: (id: string) => void;
-  onCustomTextChange: (text: string) => void;
-};
-
-function PresetPicker({
-  selectedId,
-  customText,
-  disabled,
-  onSelect,
-  onCustomTextChange,
-}: PresetPickerProps) {
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="grid grid-cols-3 gap-2">
-        {PRESETS.map((preset) => {
-          const Icon = preset.icon;
-          const isActive = selectedId === preset.id;
-          return (
-            <Card
-              key={preset.id}
-              onClick={() => !disabled && onSelect(preset.id)}
-              className={cn(
-                "cursor-pointer p-3 transition-all select-none",
-                isActive
-                  ? "ring-2 ring-primary bg-primary/5"
-                  : "hover:bg-muted/50",
-                disabled && "cursor-not-allowed opacity-50",
-              )}
-            >
-              <div className="flex items-center gap-1.5 mb-1">
-                <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                <span className="text-sm font-medium truncate">
-                  {preset.title}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground mb-2 leading-snug">
-                {preset.description}
-              </p>
-              <p className="font-mono text-xs text-muted-foreground/60 truncate">
-                {preset.examples.join(" · ")}
-              </p>
-            </Card>
-          );
-        })}
-        <Card
-          onClick={() => !disabled && onSelect(CUSTOM_PRESET_ID)}
-          className={cn(
-            "cursor-pointer p-3 transition-all select-none",
-            selectedId === CUSTOM_PRESET_ID
-              ? "ring-2 ring-primary bg-primary/5"
-              : "hover:bg-muted/50",
-            disabled && "cursor-not-allowed opacity-50",
-          )}
-        >
-          <div className="flex items-center gap-1.5 mb-1">
-            <PenLine className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-            <span className="text-sm font-medium">Custom</span>
-          </div>
-          <p className="text-xs text-muted-foreground leading-snug">
-            Paste your own word list
-          </p>
-        </Card>
-      </div>
-
-      {selectedId === CUSTOM_PRESET_ID && (
-        <Textarea
-          value={customText}
-          onChange={(e) => onCustomTextChange(e.target.value)}
-          rows={8}
-          disabled={disabled}
-          className="font-mono text-sm"
-          placeholder="Enter words, one per line..."
-        />
-      )}
-    </div>
-  );
-}
-
-// --- Hyperparameter Panel ---
-
-type TrainingConfig = {
-  learningRate: number;
-  numSteps: number;
-};
-
-type FullTrainConfig = {
-  model: ModelConfig;
-  training: TrainingConfig;
-};
-
-function configsEqual(a: FullTrainConfig, b: FullTrainConfig): boolean {
-  return (
-    a.model.nEmbd === b.model.nEmbd &&
-    a.model.nHead === b.model.nHead &&
-    a.model.nLayer === b.model.nLayer &&
-    a.model.blockSize === b.model.blockSize &&
-    a.training.learningRate === b.training.learningRate &&
-    a.training.numSteps === b.training.numSteps
-  );
-}
-
-type HyperparamPanelProps = {
-  modelConfig: ModelConfig;
-  trainingConfig: TrainingConfig;
-  temperature: number;
-  requiresRetrain: boolean;
-  disabled: boolean;
-  onModelChange: (c: ModelConfig) => void;
-  onTrainingChange: (c: TrainingConfig) => void;
-  onTemperatureChange: (t: number) => void;
-};
-
-function HyperparamPanel({
-  modelConfig,
-  trainingConfig,
-  temperature,
-  requiresRetrain,
-  disabled,
-  onModelChange,
-  onTrainingChange,
-  onTemperatureChange,
-}: HyperparamPanelProps) {
-  return (
-    <div className="flex w-56 shrink-0 flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-semibold">Hyperparameters</p>
-        {requiresRetrain && (
-          <Badge variant="destructive" className="text-xs">
-            Re-train required
-          </Badge>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Model
-        </p>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="nEmbd" className="text-xs">
-            Embedding dim
-          </Label>
-          <Select
-            value={String(modelConfig.nEmbd)}
-            onValueChange={(v) =>
-              onModelChange({ ...modelConfig, nEmbd: Number(v) })
-            }
-            disabled={disabled}
-          >
-            <SelectTrigger id="nEmbd" className="h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[8, 16, 32].map((v) => (
-                <SelectItem key={v} value={String(v)} className="text-xs">
-                  {v}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="nHead" className="text-xs">
-            Attention heads
-          </Label>
-          <Select
-            value={String(modelConfig.nHead)}
-            onValueChange={(v) =>
-              onModelChange({ ...modelConfig, nHead: Number(v) })
-            }
-            disabled={disabled}
-          >
-            <SelectTrigger id="nHead" className="h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[1, 2, 4].map((v) => (
-                <SelectItem key={v} value={String(v)} className="text-xs">
-                  {v}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="nLayer" className="text-xs">
-            Layers
-          </Label>
-          <Select
-            value={String(modelConfig.nLayer)}
-            onValueChange={(v) =>
-              onModelChange({ ...modelConfig, nLayer: Number(v) })
-            }
-            disabled={disabled}
-          >
-            <SelectTrigger id="nLayer" className="h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[1, 2, 4].map((v) => (
-                <SelectItem key={v} value={String(v)} className="text-xs">
-                  {v}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="blockSize" className="text-xs">
-            Context length
-          </Label>
-          <Select
-            value={String(modelConfig.blockSize)}
-            onValueChange={(v) =>
-              onModelChange({ ...modelConfig, blockSize: Number(v) })
-            }
-            disabled={disabled}
-          >
-            <SelectTrigger id="blockSize" className="h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[8, 16].map((v) => (
-                <SelectItem key={v} value={String(v)} className="text-xs">
-                  {v}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <Separator />
-
-      <div className="flex flex-col gap-3">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Training
-        </p>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs">Learning rate</Label>
-            <span className="font-mono text-xs text-muted-foreground">
-              {trainingConfig.learningRate.toPrecision(2)}
-            </span>
-          </div>
-          <Slider
-            min={0}
-            max={100}
-            step={1}
-            value={[lrToSlider(trainingConfig.learningRate)]}
-            onValueChange={(vals) =>
-              onTrainingChange({
-                ...trainingConfig,
-                learningRate: sliderToLr(Array.isArray(vals) ? vals[0] : vals),
-              })
-            }
-            disabled={disabled}
-            className="w-full"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs">Training steps</Label>
-            <span className="font-mono text-xs text-muted-foreground">
-              {trainingConfig.numSteps}
-            </span>
-          </div>
-          <Slider
-            min={100}
-            max={10000}
-            step={100}
-            value={[trainingConfig.numSteps]}
-            onValueChange={(vals) =>
-              onTrainingChange({
-                ...trainingConfig,
-                numSteps: Array.isArray(vals) ? vals[0] : vals,
-              })
-            }
-            disabled={disabled}
-            className="w-full"
-          />
-        </div>
-      </div>
-
-      <Separator />
-
-      <div className="flex flex-col gap-3">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Generation
-        </p>
-
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <Label className="text-xs">Temperature</Label>
-            <span className="font-mono text-xs text-muted-foreground">
-              {temperature.toFixed(1)}
-            </span>
-          </div>
-          <Slider
-            min={0}
-            max={10}
-            step={1}
-            value={[Math.round(temperature * 10)]}
-            onValueChange={(vals) =>
-              onTemperatureChange((Array.isArray(vals) ? vals[0] : vals) / 10)
-            }
-            className="w-full"
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const LR_MIN = 0.001;
-const LR_MAX = 0.5;
-const LR_LOG_MIN = Math.log10(LR_MIN);
-const LR_LOG_MAX = Math.log10(LR_MAX);
-
-function sliderToLr(v: number): number {
-  return 10 ** (LR_LOG_MIN + (v / 100) * (LR_LOG_MAX - LR_LOG_MIN));
-}
-
-function lrToSlider(lr: number): number {
-  return Math.round(
-    ((Math.log10(lr) - LR_LOG_MIN) / (LR_LOG_MAX - LR_LOG_MIN)) * 100,
-  );
-}
-
-// --- Loss Chart ---
-
-type LossPoint = { step: number; loss: number };
-
-const MAX_CHART_POINTS = 200;
-
-function downsample(points: LossPoint[]): LossPoint[] {
-  if (points.length <= MAX_CHART_POINTS) return points;
-  const every = Math.ceil(points.length / MAX_CHART_POINTS);
-  const result: LossPoint[] = [];
-  for (let i = 0; i < points.length; i += every) result.push(points[i]);
-  if (result[result.length - 1] !== points[points.length - 1])
-    result.push(points[points.length - 1]);
-  return result;
-}
-
-const lossChartConfig = {
-  loss: { label: "Loss", color: "var(--chart-1)" },
-} satisfies ChartConfig;
-
-function LossChart({
-  data,
-  numSteps,
-  currentLoss,
-}: {
-  data: LossPoint[];
-  numSteps: number;
-  currentLoss: number;
-}) {
-  const display = downsample(data);
-  const yMax = data.length > 0 ? Math.ceil(data[0].loss) : 4;
-  const lastStep = data.length > 0 ? data[data.length - 1].step : 0;
-  return (
-    <Card size="sm">
-      <CardHeader>
-        <CardTitle>Training Loss</CardTitle>
-        <CardDescription>
-          Smoothed loss over {lastStep.toLocaleString()} /{" "}
-          {numSteps.toLocaleString()} steps — current:{" "}
-          <span className="font-mono font-medium text-foreground">
-            {currentLoss.toFixed(4)}
-          </span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={lossChartConfig} className="h-48 w-full">
-          <AreaChart data={display} accessibilityLayer>
-            <defs>
-              <linearGradient id="lossGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop
-                  offset="0%"
-                  stopColor="var(--color-loss)"
-                  stopOpacity={0.3}
-                />
-                <stop
-                  offset="100%"
-                  stopColor="var(--color-loss)"
-                  stopOpacity={0.02}
-                />
-              </linearGradient>
-            </defs>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="step"
-              type="number"
-              domain={[0, numSteps]}
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(v: number) =>
-                v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v)
-              }
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              domain={[0, yMax]}
-              tickFormatter={(v: number) => v.toFixed(1)}
-            />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  hideIndicator
-                  labelFormatter={(_, payload) => {
-                    const p = payload?.[0]?.payload as LossPoint | undefined;
-                    return p ? `Step ${p.step}` : "";
-                  }}
-                  formatter={(value) => (
-                    <span className="font-mono font-medium tabular-nums">
-                      {(value as number).toFixed(4)}
-                    </span>
-                  )}
-                />
-              }
-            />
-            <Area
-              dataKey="loss"
-              type="monotone"
-              stroke="var(--color-loss)"
-              strokeWidth={2}
-              fill="url(#lossGradient)"
-            />
-          </AreaChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
-  );
-}
-
-// --- Live Gen Stream ---
-
-type LiveGenEntry = { step: number; words: string[] };
-
-const MAX_LIVE_GEN = 15;
 const LIVE_GEN_INTERVAL = 100;
 const LIVE_GEN_SAMPLES = 3;
+const MAX_LIVE_GEN = 15;
+const DEFAULT_NUM_SAMPLES = 10;
 
-function LiveGenStream({ entries }: { entries: LiveGenEntry[] }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+// --- Types ---
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on new entries
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  }, [entries.length]);
-
-  if (entries.length === 0) return null;
-
-  return (
-    <div className="flex flex-col gap-2">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-        Live samples
-      </p>
-      <div
-        ref={scrollRef}
-        className="h-36 overflow-y-auto rounded-md border bg-muted/30 p-3"
-      >
-        {entries.map((entry) => (
-          <div
-            key={entry.step}
-            className="flex gap-3 font-mono text-xs leading-relaxed"
-          >
-            <span className="shrink-0 text-muted-foreground/50 tabular-nums">
-              {String(entry.step).padStart(5, "\u2007")}
-            </span>
-            <span className="text-muted-foreground">—</span>
-            <span>{entry.words.join(" · ")}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+type Status = "idle" | "training" | "trained";
+type TabId = "dataset" | "train" | "generate";
 
 // --- Main Demo ---
 
-type Status = "idle" | "training" | "trained";
-
-const NUM_SAMPLES = 10;
-
 export function TrainDemo() {
+  const [tab, setTab] = useState<TabId>("dataset");
   const [selectedPresetId, setSelectedPresetId] = useState("baby-names");
   const [customText, setCustomText] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -1017,6 +62,7 @@ export function TrainDemo() {
     numSteps: 1000,
   });
   const [temperature, setTemperature] = useState(0.5);
+  const [numSamples, setNumSamples] = useState(DEFAULT_NUM_SAMPLES);
   const temperatureRef = useRef(temperature);
   useEffect(() => {
     temperatureRef.current = temperature;
@@ -1027,15 +73,9 @@ export function TrainDemo() {
       ? customText
       : (PRESETS.find((p) => p.id === selectedPresetId)?.words ?? "");
 
-  const trainedConfigRef = useRef<FullTrainConfig | null>(null);
-
-  const requiresRetrain =
-    status === "trained" &&
-    trainedConfigRef.current !== null &&
-    !configsEqual(trainedConfigRef.current, {
-      model: modelConfig,
-      training: trainingConfig,
-    });
+  const wordCount = namesText
+    .split("\n")
+    .filter((l) => l.trim().length > 0).length;
 
   const handleRef = useRef<TrainHandle | null>(null);
   const modelRef = useRef<{
@@ -1056,6 +96,7 @@ export function TrainDemo() {
   const lossBufferRef = useRef<LossPoint[]>([]);
 
   const handleTrain = useCallback(async () => {
+    setTab("train");
     setStatus("training");
     setStep(0);
     setLoss(0);
@@ -1118,103 +159,292 @@ export function TrainDemo() {
     await handle.promise;
     handleRef.current = null;
     setLossHistory([...lossBufferRef.current]);
-    trainedConfigRef.current = { model: modelConfig, training: trainingConfig };
     setStatus((prev) => (prev === "training" ? "trained" : prev));
   }, [namesText, modelConfig, trainingConfig]);
 
   const handleStop = useCallback(() => {
     handleRef.current?.abort();
     handleRef.current = null;
-    trainedConfigRef.current = { model: modelConfig, training: trainingConfig };
     setStatus("trained");
-  }, [modelConfig, trainingConfig]);
+  }, []);
 
   const handleGenerate = useCallback(() => {
     if (!modelRef.current) return;
     const { stateDict, tokenizer, modelConfig: mc } = modelRef.current;
     const names: string[] = [];
-    for (let i = 0; i < NUM_SAMPLES; i++) {
+    for (let i = 0; i < numSamples; i++) {
       names.push(inference(stateDict, tokenizer, temperature, mc));
     }
     setOutput(names);
-  }, [temperature]);
+  }, [temperature, numSamples]);
+
+  const isTraining = status === "training";
+  const isTrained = status === "trained";
 
   return (
-    <div className="flex w-full max-w-4xl gap-8">
-      <HyperparamPanel
-        modelConfig={modelConfig}
-        trainingConfig={trainingConfig}
-        temperature={temperature}
-        requiresRetrain={requiresRetrain}
-        disabled={status === "training"}
-        onModelChange={setModelConfig}
-        onTrainingChange={setTrainingConfig}
-        onTemperatureChange={setTemperature}
-      />
+    <Tabs
+      value={tab}
+      onValueChange={(v) => setTab(v as TabId)}
+      className="flex w-full max-w-5xl flex-col"
+    >
+      <TabsList className="mb-6 w-fit self-start">
+        <TabsTrigger value="dataset">Dataset</TabsTrigger>
+        <TabsTrigger value="train">Train</TabsTrigger>
+        <TabsTrigger value="generate" disabled={!isTrained && !isTraining}>
+          Generate
+        </TabsTrigger>
+      </TabsList>
 
-      <Separator orientation="vertical" className="h-auto" />
-
-      <div className="flex min-w-0 flex-1 flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Dataset
-          </p>
-          <PresetPicker
+      <div className="flex gap-8">
+        {/* Adaptive sidebar */}
+        {tab === "dataset" && (
+          <DatasetSidebar
             selectedId={selectedPresetId}
-            customText={customText}
-            disabled={status === "training"}
+            disabled={isTraining}
             onSelect={setSelectedPresetId}
-            onCustomTextChange={setCustomText}
           />
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Button onClick={handleTrain} disabled={status === "training"}>
-            Train
-          </Button>
-          {status === "training" && (
-            <Button variant="outline" onClick={handleStop}>
-              Stop
-            </Button>
-          )}
-          <Button
-            variant="secondary"
-            onClick={handleGenerate}
-            disabled={status !== "trained"}
-          >
-            Generate
-          </Button>
-        </div>
-
-        {(status === "training" || status === "trained") && (
-          <div className="flex flex-col gap-3">
-            <p className="font-mono text-sm text-muted-foreground">
-              step {step} / {trainingConfig.numSteps} | loss: {loss.toFixed(4)}{" "}
-              | {(elapsed / 1000).toFixed(1)}s
-            </p>
-            {lossHistory.length > 1 && (
-              <LossChart
-                data={lossHistory}
-                numSteps={trainingConfig.numSteps}
-                currentLoss={loss}
-              />
-            )}
-          </div>
+        )}
+        {tab === "train" && (
+          <TrainSidebar
+            modelConfig={modelConfig}
+            trainingConfig={trainingConfig}
+            disabled={isTraining}
+            onModelChange={setModelConfig}
+            onTrainingChange={setTrainingConfig}
+          />
+        )}
+        {tab === "generate" && (
+          <GenerateSidebar
+            temperature={temperature}
+            numSamples={numSamples}
+            onTemperatureChange={setTemperature}
+            onNumSamplesChange={setNumSamples}
+          />
         )}
 
-        <LiveGenStream entries={liveGenEntries} />
+        <Separator orientation="vertical" className="h-auto" />
 
-        {output.length > 0 && (
-          <div className="rounded-md border p-4">
-            <p className="mb-2 text-sm font-medium">Generated:</p>
-            <ul className="font-mono text-sm">
-              {output.map((name, i) => (
-                <li key={`${i}-${name}`}>{name}</li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {/* Main content area */}
+        <div className="min-w-0 flex-1">
+          <TabsContent value="dataset" className="mt-0">
+            <DatasetTab
+              namesText={namesText}
+              customText={customText}
+              selectedPresetId={selectedPresetId}
+              wordCount={wordCount}
+              disabled={isTraining}
+              onCustomTextChange={setCustomText}
+              onTrain={handleTrain}
+            />
+          </TabsContent>
+
+          <TabsContent value="train" className="mt-0">
+            <TrainTab
+              status={status}
+              step={step}
+              loss={loss}
+              elapsed={elapsed}
+              trainingConfig={trainingConfig}
+              lossHistory={lossHistory}
+              liveGenEntries={liveGenEntries}
+              onTrain={handleTrain}
+              onStop={handleStop}
+              onSwitchToGenerate={() => setTab("generate")}
+            />
+          </TabsContent>
+
+          <TabsContent value="generate" className="mt-0">
+            <GenerateTab
+              status={status}
+              output={output}
+              onGenerate={handleGenerate}
+              onSwitchToTrain={() => setTab("train")}
+            />
+          </TabsContent>
+        </div>
       </div>
+    </Tabs>
+  );
+}
+
+// --- Dataset Tab Content ---
+
+function DatasetTab({
+  namesText,
+  customText,
+  selectedPresetId,
+  wordCount,
+  disabled,
+  onCustomTextChange,
+  onTrain,
+}: {
+  namesText: string;
+  customText: string;
+  selectedPresetId: string;
+  wordCount: number;
+  disabled: boolean;
+  onCustomTextChange: (text: string) => void;
+  onTrain: () => void;
+}) {
+  const isCustom = selectedPresetId === CUSTOM_PRESET_ID;
+  return (
+    <div className="flex flex-col gap-4">
+      <Textarea
+        value={isCustom ? customText : namesText}
+        onChange={
+          isCustom ? (e) => onCustomTextChange(e.target.value) : undefined
+        }
+        readOnly={!isCustom}
+        rows={20}
+        className="font-mono text-sm resize-none"
+        placeholder={isCustom ? "Enter words, one per line..." : ""}
+      />
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          {wordCount} {wordCount === 1 ? "word" : "words"}
+        </p>
+        <Button onClick={onTrain} disabled={disabled || wordCount === 0}>
+          Train on this dataset
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// --- Train Tab Content ---
+
+function TrainTab({
+  status,
+  step,
+  loss,
+  elapsed,
+  trainingConfig,
+  lossHistory,
+  liveGenEntries,
+  onTrain,
+  onStop,
+  onSwitchToGenerate,
+}: {
+  status: Status;
+  step: number;
+  loss: number;
+  elapsed: number;
+  trainingConfig: TrainingConfig;
+  lossHistory: LossPoint[];
+  liveGenEntries: LiveGenEntry[];
+  onTrain: () => void;
+  onStop: () => void;
+  onSwitchToGenerate: () => void;
+}) {
+  const isTraining = status === "training";
+  const isTrained = status === "trained";
+
+  if (status === "idle") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
+        <p className="text-muted-foreground">
+          Configure hyperparameters, then start training.
+        </p>
+        <Button onClick={onTrain}>Train</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex items-center gap-3">
+        <Button onClick={onTrain} disabled={isTraining}>
+          {isTrained ? "Re-train" : "Train"}
+        </Button>
+        {isTraining && (
+          <Button variant="outline" onClick={onStop}>
+            Stop
+          </Button>
+        )}
+        <p className="font-mono text-sm text-muted-foreground">
+          step {step} / {trainingConfig.numSteps} | loss: {loss.toFixed(4)} |{" "}
+          {(elapsed / 1000).toFixed(1)}s
+        </p>
+      </div>
+
+      {lossHistory.length > 1 && (
+        <LossChart
+          data={lossHistory}
+          numSteps={trainingConfig.numSteps}
+          currentLoss={loss}
+        />
+      )}
+
+      <LiveGenStream entries={liveGenEntries} />
+
+      {isTrained && (
+        <button
+          type="button"
+          onClick={onSwitchToGenerate}
+          className="self-start text-sm text-primary hover:underline"
+        >
+          Model ready — switch to Generate &rarr;
+        </button>
+      )}
+    </div>
+  );
+}
+
+// --- Generate Tab Content ---
+
+function GenerateTab({
+  status,
+  output,
+  onGenerate,
+  onSwitchToTrain,
+}: {
+  status: Status;
+  output: string[];
+  onGenerate: () => void;
+  onSwitchToTrain: () => void;
+}) {
+  if (status !== "trained") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
+        <p className="text-muted-foreground">
+          Train the model first to generate new words.
+        </p>
+        <Button variant="outline" onClick={onSwitchToTrain}>
+          Go to Train
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-5">
+      <Button onClick={onGenerate} className="w-fit">
+        Generate
+      </Button>
+
+      {output.length > 0 && (
+        <div className="grid grid-cols-2 gap-x-8 gap-y-1.5 rounded-lg border bg-muted/30 p-6 sm:grid-cols-3">
+          {output.map((name, i) => (
+            <span
+              key={`${i}-${name}`}
+              className={cn(
+                "font-mono text-base",
+                i === 0 && "text-foreground",
+              )}
+            >
+              {name}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {output.length === 0 && (
+        <div className="flex items-center justify-center rounded-lg border border-dashed py-16">
+          <p className="text-sm text-muted-foreground">
+            Click Generate to create new words
+          </p>
+        </div>
+      )}
     </div>
   );
 }
