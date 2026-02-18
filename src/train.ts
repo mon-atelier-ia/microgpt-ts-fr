@@ -50,8 +50,7 @@ export function trainStep(
   const lr = learningRate * (1 - step / numSteps);
   params.forEach((param, idx) => {
     adamState.m[idx] = beta1 * adamState.m[idx] + (1 - beta1) * param.grad;
-    adamState.v[idx] =
-      beta2 * adamState.v[idx] + (1 - beta2) * param.grad ** 2;
+    adamState.v[idx] = beta2 * adamState.v[idx] + (1 - beta2) * param.grad ** 2;
     const mHat = adamState.m[idx] / (1 - beta1 ** (step + 1));
     const vHat = adamState.v[idx] / (1 - beta2 ** (step + 1));
     param.data -= (lr * mHat) / (vHat ** 0.5 + eps);
@@ -77,13 +76,17 @@ export function train(
     const doc = docs[step % docs.length];
     const tokens = tokenizer.encode(doc);
     const info = trainStep(
-      params, stateDict, adamState, tokens, step, numSteps, config,
+      params,
+      stateDict,
+      adamState,
+      tokens,
+      step,
+      numSteps,
+      config,
     );
 
     // Exponential moving average for loss
-    smoothLoss = step === 0
-      ? info.loss
-      : 0.99 * smoothLoss + 0.01 * info.loss;
+    smoothLoss = step === 0 ? info.loss : 0.99 * smoothLoss + 0.01 * info.loss;
     info.smoothLoss = smoothLoss;
 
     if (onStep) onStep(info);

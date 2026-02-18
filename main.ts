@@ -1,8 +1,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { buildTokenizer, getParams, inference, initStateDict } from "./src/model";
-import { parseDocs } from "./src/utils";
+import {
+  buildTokenizer,
+  getParams,
+  inference,
+  initStateDict,
+} from "./src/model";
 import { initAdamState, train } from "./src/train";
+import { parseDocs } from "./src/utils";
 
 const DATASET_URL =
   "https://raw.githubusercontent.com/karpathy/makemore/refs/heads/master/names.txt";
@@ -43,13 +48,21 @@ const adamState = initAdamState(params.length);
 console.log(`num params: ${params.length}`);
 
 const startTime = Date.now();
-train(stateDict, adamState, docs, tokenizer, TRAIN_STEPS, ADAM_CONFIG, (info) => {
-  if (info.step < 5 || info.step % 200 === 0) {
-    console.log(
-      `step ${String(info.step + 1).padStart(4)} / ${String(info.numSteps).padStart(4)} | loss ${info.smoothLoss.toFixed(4)}`,
-    );
-  }
-});
+train(
+  stateDict,
+  adamState,
+  docs,
+  tokenizer,
+  TRAIN_STEPS,
+  ADAM_CONFIG,
+  (info) => {
+    if (info.step < 5 || info.step % 200 === 0) {
+      console.log(
+        `step ${String(info.step + 1).padStart(4)} / ${String(info.numSteps).padStart(4)} | loss ${info.smoothLoss.toFixed(4)}`,
+      );
+    }
+  },
+);
 console.log(`training time: ${((Date.now() - startTime) / 1000).toFixed(2)}s`);
 
 inference(stateDict, tokenizer, NUM_SAMPLES);
