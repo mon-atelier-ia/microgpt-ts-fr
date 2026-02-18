@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { Github } from "lucide-react";
+import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Separator } from "@/components/ui/separator";
 
 export function Navbar() {
@@ -10,6 +11,7 @@ export function Navbar() {
           microgpt
         </Link>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <a
             href="https://github.com/dubzdubz/microgpt-ts"
             target="_blank"
