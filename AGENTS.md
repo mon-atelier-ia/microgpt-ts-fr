@@ -1,5 +1,10 @@
 > **Note:** `CLAUDE.md` is a symlink to this file. `AGENTS.md` is the source of truth — edit this file, not `CLAUDE.md`.
 
+## Agent Behavior
+
+- Be proactive: when you learn something important (decisions, conventions, pitfalls, user preferences), save it to `AGENTS.md` or the relevant file in `docs/`.
+- For non-trivial tasks, create a plan doc in `docs/plans/` using the filename format `YY-MM-DD-short-description.md` (e.g. `26-02-18-add-auth-flow.md`).
+
 ## Documentation
 
 Project documentation lives in docs/. Use it extensively.
