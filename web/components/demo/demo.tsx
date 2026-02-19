@@ -167,7 +167,8 @@ export function TrainDemo() {
           if (target) target.evalLoss = evalInfo.evalLoss;
           setLossHistory([...lossBufferRef.current]);
         },
-        workerUrl: new URL("../../workers/eval-worker.ts", import.meta.url),
+        createWorker: () =>
+          new Worker(new URL("../../workers/eval-worker.ts", import.meta.url)),
       },
     );
     handleRef.current = handle;

@@ -57,7 +57,7 @@ export type EvalInfo = {
 export type EvalConfig = {
   docs: string[];
   onEval: (info: EvalInfo) => void;
-  workerUrl: URL;
+  createWorker: () => Worker;
 };
 
 export function trainAsync(
@@ -85,7 +85,7 @@ export function trainAsync(
   const evalStepMap: Record<number, number> = {};
 
   if (encodedEvalDocs && encodedEvalDocs.length > 0 && evalConfig) {
-    worker = new Worker(evalConfig.workerUrl);
+    worker = evalConfig.createWorker();
     worker.onmessage = (e: MessageEvent<{ id: number; avgLoss: number }>) => {
       inflight--;
       if (e.data.id <= latestEvalId) {
