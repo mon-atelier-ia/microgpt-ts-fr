@@ -8,7 +8,7 @@ import {
 } from "./model";
 import type { Value } from "./value";
 
-const EMA_ALPHA = 0.01;
+const EMA_ALPHA = 0.1;
 
 export type AdamConfig = {
   learningRate: number;
