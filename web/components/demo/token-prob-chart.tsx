@@ -33,15 +33,16 @@ export function TokenProbChart({
                 className="relative flex-1 min-w-0 flex flex-col items-center justify-end h-full"
               >
                 {showLabel && (
-                  <span className="text-[9px] font-medium text-[var(--chart-1)] mb-0.5 tabular-nums">
+                  <span
+                    className="text-[9px] font-medium mb-0.5 tabular-nums text-chart-1"
+                  >
                     {`${Math.round(prob * 100)}%`}
                   </span>
                 )}
                 <motion.div
-                  className="w-full rounded-t-sm"
+                  className="w-full rounded-t-sm bg-chart-1"
                   style={{
-                    backgroundColor: "var(--chart-1)",
-                    opacity: isSampled ? 1 : 0.4,
+                    opacity: isSampled ? 1 : 0.3,
                   }}
                   animate={{ height: `${heightPct}%` }}
                   initial={{ height: "0%" }}
@@ -61,7 +62,7 @@ export function TokenProbChart({
                 key={i}
                 className={`flex-1 min-w-0 text-center text-[10px] leading-none truncate ${
                   isSampled
-                    ? "font-bold text-[var(--chart-1)]"
+                    ? "font-bold text-chart-1"
                     : "text-muted-foreground"
                 }`}
               >

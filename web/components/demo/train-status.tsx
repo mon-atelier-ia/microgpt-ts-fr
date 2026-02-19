@@ -8,14 +8,17 @@ type TrainStatusProps = {
 
 function Stat({
   label,
+  indicator,
   children,
 }: {
   label: string;
+  indicator?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+      <span className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+        {indicator}
         {label}
       </span>
       {children}
@@ -42,13 +45,23 @@ export function TrainStatus({
         </span>
       </Stat>
 
-      <Stat label="Train loss">
+      <Stat
+        label="Train loss"
+        indicator={
+          <span className="inline-block h-2 w-2 rounded-full bg-chart-1" />
+        }
+      >
         <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
           {loss > 0 ? loss.toFixed(4) : "—"}
         </span>
       </Stat>
 
-      <Stat label="Eval loss">
+      <Stat
+        label="Eval loss"
+        indicator={
+          <span className="inline-block h-2 w-2 rounded-full bg-chart-2" />
+        }
+      >
         <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
           {evalLoss !== undefined && evalLoss > 0 ? evalLoss.toFixed(4) : "—"}
         </span>
