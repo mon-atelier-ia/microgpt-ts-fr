@@ -36,14 +36,11 @@ export function emaSmooth(prev: number | undefined, value: number): number {
     : (1 - EMA_ALPHA) * prev + EMA_ALPHA * value;
 }
 
-export const initAdamState = (nParams: number): AdamState => {
-  return {
-    m: Array.from({ length: nParams }, () => 0),
-    v: Array.from({ length: nParams }, () => 0),
-  };
-};
+export const initAdamState = (nParams: number): AdamState => ({
+  m: new Array(nParams).fill(0),
+  v: new Array(nParams).fill(0),
+});
 
-// Single training step. Returns step info for observability.
 export function trainStep(
   params: Value[],
   stateDict: StateDict,

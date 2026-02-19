@@ -1,10 +1,8 @@
 import { Value } from "./value";
 
-// sum of an array
 export const sum = (arr: Value[]): Value =>
   arr.reduce((a, b) => a.add(b), new Value(0));
 
-// mean of an array
 export const mean = (arr: Value[]): Value => sum(arr).div(arr.length);
 
 // Sample from a probability distribution using cumulative weights
@@ -19,17 +17,15 @@ export function sample(weights: number[]): number {
   return weights.length - 1;
 }
 
-// Gaussian random number using Box-Muller transform
-// https://en.wikipedia.org/wiki/Box%E2%80%93Muller_transform
+// Box-Muller transform
 export function randomGaussian(mean = 0, std = 1): number {
   let u1 = 0;
-  while (u1 === 0) u1 = Math.random(); // avoid 0
+  while (u1 === 0) u1 = Math.random();
   const u2 = Math.random();
   const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
   return mean + std * z;
 }
 
-// Random nout x nin matrix with Gaussian-distributed values
 export const gaussianMatrix = (
   nout: number,
   nin: number,
@@ -63,8 +59,8 @@ export function parseDocs(text: string): string[] {
   const docs = text
     .trim()
     .split("\n")
-    .map((line: string) => line.trim())
-    .filter((line: string) => line.length > 0);
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
   return shuffle(docs);
 }
 
@@ -73,9 +69,9 @@ export function splitDocs(
   evalFraction = 0.1,
 ): { train: string[]; eval: string[] } {
   const nEval = Math.max(1, Math.round(docs.length * evalFraction));
-  const shuffledDocs = shuffle(docs);
+  const shuffled = shuffle(docs);
   return {
-    train: shuffledDocs.slice(nEval),
-    eval: shuffledDocs.slice(0, nEval),
+    train: shuffled.slice(nEval),
+    eval: shuffled.slice(0, nEval),
   };
 }

@@ -81,7 +81,6 @@ export function getParams(stateDict: StateDict): Value[] {
   return Object.values(stateDict).flat(3);
 }
 
-// Linear transformation: W * x
 function linear(x: Value[], w: Value[][]): Value[] {
   return w.map((wo) => sum(wo.map((wi, i) => wi.mul(x[i]))));
 }
@@ -107,11 +106,9 @@ function softmax(logits: Value[]): Value[] {
   return exps.map((e) => e.div(total));
 }
 
-// Loss function: -log(prob)
 const lossFn = (prob: Value): Value => prob.log().neg();
 
-// RMSNorm normalization: (x^2 + 1e-5)^-0.5
-export function rmsnorm(x: Value[]): Value[] {
+function rmsnorm(x: Value[]): Value[] {
   const ms = mean(x.map((xi) => xi.pow(2)));
   const scale = ms.add(1e-5).pow(-0.5);
   return x.map((xi) => xi.mul(scale));

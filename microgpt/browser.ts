@@ -54,11 +54,13 @@ export function trainAsync(
   let onDrain: (() => void) | null = null;
   const evalStepMap: Record<number, number> = {};
 
-  if (encodedEvalDocs && encodedEvalDocs.length > 0 && onEval) {
-    worker = new Worker(
-      evalWorkerUrl ??
-        new URL("../web/workers/eval-worker.ts", import.meta.url),
-    );
+  if (
+    encodedEvalDocs &&
+    encodedEvalDocs.length > 0 &&
+    onEval &&
+    evalWorkerUrl
+  ) {
+    worker = new Worker(evalWorkerUrl);
     worker.onmessage = (e: MessageEvent<{ id: number; avgLoss: number }>) => {
       inflight--;
       if (e.data.id <= latestEvalId) {

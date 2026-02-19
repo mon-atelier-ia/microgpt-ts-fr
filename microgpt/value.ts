@@ -1,4 +1,4 @@
-// Implements Autograd to recursively apply the chain rule through a computation graph
+// Autograd: recursive chain rule through a computation graph
 export class Value {
   data: number;
   grad: number;
