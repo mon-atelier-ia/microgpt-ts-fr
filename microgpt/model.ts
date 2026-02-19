@@ -206,13 +206,22 @@ export function* inferenceStepwise(
   tokenizer: Tokenizer,
   temperature = 0.5,
   config: ModelConfig = DEFAULT_CONFIG,
+  prefixTokens: number[] = [],
 ): Generator<InferenceStep> {
   const { BOS } = tokenizer;
   let tokenId = BOS;
   const tokens: number[] = [];
   const keys: Value[][][] = init2dList(config.nLayer);
   const values: Value[][][] = init2dList(config.nLayer);
-  for (let posId = 0; posId < config.blockSize; posId++) {
+
+  // Feed prefix tokens deterministically (build KV cache, no sampling)
+  for (let i = 0; i < prefixTokens.length; i++) {
+    gpt(stateDict, tokenId, i, keys, values, config);
+    tokenId = prefixTokens[i];
+    tokens.push(tokenId);
+  }
+
+  for (let posId = prefixTokens.length; posId < config.blockSize; posId++) {
     const logits = gpt(stateDict, tokenId, posId, keys, values, config);
     const scaled =
       temperature === 0 ? logits : logits.map((l) => l.div(temperature));
@@ -234,9 +243,10 @@ export function inference(
   tokenizer: Tokenizer,
   temperature = 0.5,
   config: ModelConfig = DEFAULT_CONFIG,
+  prefixTokens: number[] = [],
 ): string {
   let tokens: number[] = [];
-  for (const step of inferenceStepwise(stateDict, tokenizer, temperature, config)) {
+  for (const step of inferenceStepwise(stateDict, tokenizer, temperature, config, prefixTokens)) {
     tokens = step.prevTokens;
   }
   return tokenizer.decode(tokens);
