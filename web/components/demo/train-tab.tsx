@@ -11,6 +11,7 @@ export function TrainTab({
   status,
   step,
   loss,
+  evalLoss,
   elapsed,
   trainingConfig,
   lossHistory,
@@ -19,6 +20,7 @@ export function TrainTab({
   status: Status;
   step: number;
   loss: number;
+  evalLoss?: number;
   elapsed: number;
   trainingConfig: TrainingConfig;
   lossHistory: LossPoint[];
@@ -42,14 +44,14 @@ export function TrainTab({
         step={step}
         numSteps={trainingConfig.numSteps}
         loss={loss}
+        evalLoss={evalLoss}
         elapsed={elapsed}
-        isTraining={isTraining}
       />
 
       {lossHistory.length > 1 && (
         <div className="flex flex-col gap-2">
           <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Training Loss
+            Loss
           </p>
           <LossChart data={lossHistory} numSteps={trainingConfig.numSteps} />
         </div>

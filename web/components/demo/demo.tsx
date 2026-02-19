@@ -21,7 +21,7 @@ import {
   type AdamState,
   initAdamState,
 } from "../../../microgpt/train";
-import { parseDocs } from "../../../microgpt/utils";
+import { parseDocs, splitDocs } from "../../../microgpt/utils";
 import { DatasetSidebar } from "./dataset-sidebar";
 import { DatasetTab } from "./dataset-tab";
 import { GenerateSidebar } from "./generate-sidebar";
@@ -54,6 +54,7 @@ export function TrainDemo() {
   const [status, setStatus] = useState<Status>("idle");
   const [step, setStep] = useState(0);
   const [loss, setLoss] = useState(0);
+  const [evalLoss, setEvalLoss] = useState<number | undefined>(undefined);
   const [lossHistory, setLossHistory] = useState<LossPoint[]>([]);
   const [liveGenEntries, setLiveGenEntries] = useState<LiveGenEntry[]>([]);
   const [output, setOutput] = useState<string[]>([]);
@@ -66,6 +67,7 @@ export function TrainDemo() {
   });
   const [temperature, setTemperature] = useState(0.5);
   const [numSamples, setNumSamples] = useState(DEFAULT_NUM_SAMPLES);
+  const [prefix, setPrefix] = useState("");
   const temperatureRef = useRef(temperature);
   useEffect(() => {
     temperatureRef.current = temperature;
@@ -103,14 +105,16 @@ export function TrainDemo() {
     setStatus("training");
     setStep(0);
     setLoss(0);
+    setEvalLoss(undefined);
     setLossHistory([]);
     setLiveGenEntries([]);
     setOutput([]);
     setElapsed(0);
     lossBufferRef.current = [];
 
-    const docs = parseDocs(namesText);
-    const tokenizer = buildTokenizer(docs);
+    const allDocs = parseDocs(namesText);
+    const { train: trainDocs, eval: evalDocsSplit } = splitDocs(allDocs);
+    const tokenizer = buildTokenizer(allDocs);
     const stateDict = initStateDict(tokenizer.vocabSize, modelConfig);
     const adamState = initAdamState(getParams(stateDict).length);
 
@@ -126,7 +130,7 @@ export function TrainDemo() {
     const handle = trainAsync(
       stateDict,
       adamState,
-      docs,
+      trainDocs,
       tokenizer,
       trainingConfig.numSteps,
       adamConfig,
@@ -135,7 +139,14 @@ export function TrainDemo() {
         const s = info.step + 1;
         setStep(s);
         setLoss(info.smoothLoss);
-        lossBufferRef.current.push({ step: s, loss: info.smoothLoss });
+        if (info.smoothEvalLoss !== undefined) {
+          setEvalLoss(info.smoothEvalLoss);
+        }
+        lossBufferRef.current.push({
+          step: s,
+          loss: info.smoothLoss,
+          evalLoss: info.smoothEvalLoss,
+        });
         if (s % 10 === 0 || s === info.numSteps) {
           setLossHistory([...lossBufferRef.current]);
         }
@@ -156,6 +167,7 @@ export function TrainDemo() {
           });
         }
       },
+      evalDocsSplit,
     );
     handleRef.current = handle;
 
@@ -176,6 +188,12 @@ export function TrainDemo() {
   const [exploreDone, setExploreDone] = useState(false);
   const generatorRef = useRef<Generator<InferenceStep> | null>(null);
 
+  const encodePrefixTokens = useCallback((): number[] => {
+    if (!modelRef.current || prefix.length === 0) return [];
+    const { chars } = modelRef.current.tokenizer;
+    return [...prefix].map((ch) => chars.indexOf(ch)).filter((id) => id >= 0);
+  }, [prefix]);
+
   const handleNextToken = useCallback(() => {
     if (!modelRef.current) return;
     const { stateDict, tokenizer, modelConfig: mc } = modelRef.current;
@@ -185,6 +203,7 @@ export function TrainDemo() {
         tokenizer,
         temperature,
         mc,
+        encodePrefixTokens(),
       );
     }
     const result = generatorRef.current.next();
@@ -194,13 +213,21 @@ export function TrainDemo() {
       setExploreDone(true);
       generatorRef.current = null;
     }
-  }, [temperature]);
+  }, [temperature, encodePrefixTokens]);
 
   const handleResetExplore = useCallback(() => {
     generatorRef.current = null;
     setExploreSteps([]);
     setExploreDone(false);
   }, []);
+
+  const handlePrefixChange = useCallback(
+    (newPrefix: string) => {
+      setPrefix(newPrefix);
+      handleResetExplore();
+    },
+    [handleResetExplore],
+  );
 
   const [isGenerating, setIsGenerating] = useState(false);
   const genAbortRef = useRef<AbortController | null>(null);
@@ -212,6 +239,7 @@ export function TrainDemo() {
     genAbortRef.current = abort;
 
     const { stateDict, tokenizer, modelConfig: mc } = modelRef.current;
+    const pfx = encodePrefixTokens();
     setOutput([]);
     setIsGenerating(true);
 
@@ -223,13 +251,13 @@ export function TrainDemo() {
         genAbortRef.current = null;
         return;
       }
-      const word = inference(stateDict, tokenizer, temperature, mc);
+      const word = inference(stateDict, tokenizer, temperature, mc, pfx);
       setOutput((prev) => [...prev, word]);
       i++;
       setTimeout(tick, 80);
     };
     tick();
-  }, [temperature, numSamples]);
+  }, [temperature, numSamples, encodePrefixTokens]);
 
   const isTraining = status === "training";
   const isTrained = status === "trained";
@@ -283,9 +311,16 @@ export function TrainDemo() {
             numSamples={numSamples}
             isGenerating={isGenerating}
             exploreDone={exploreDone}
+            prefix={prefix}
+            maxPrefixLength={
+              (modelRef.current?.modelConfig.blockSize ??
+                DEFAULT_CONFIG.blockSize) - 1
+            }
+            allowedChars={modelRef.current?.tokenizer.chars ?? []}
             onModeChange={setGenerateMode}
             onTemperatureChange={setTemperature}
             onNumSamplesChange={setNumSamples}
+            onPrefixChange={handlePrefixChange}
             onGenerate={handleGenerate}
             onNextToken={handleNextToken}
             onResetExplore={handleResetExplore}
@@ -311,6 +346,7 @@ export function TrainDemo() {
               status={status}
               step={step}
               loss={loss}
+              evalLoss={evalLoss}
               elapsed={elapsed}
               trainingConfig={trainingConfig}
               lossHistory={lossHistory}
@@ -332,10 +368,7 @@ export function TrainDemo() {
                   : []
               }
               BOS={modelRef.current?.tokenizer.BOS ?? 0}
-              blockSize={
-                modelRef.current?.modelConfig.blockSize ??
-                DEFAULT_CONFIG.blockSize
-              }
+              prefixChars={[...prefix]}
               onSwitchToTrain={() => setTab("train")}
             />
           </TabsContent>

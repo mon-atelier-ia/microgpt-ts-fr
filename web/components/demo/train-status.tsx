@@ -2,8 +2,8 @@ type TrainStatusProps = {
   step: number;
   numSteps: number;
   loss: number;
+  evalLoss?: number;
   elapsed: number;
-  isTraining: boolean;
 };
 
 function Stat({
@@ -27,11 +27,11 @@ export function TrainStatus({
   step,
   numSteps,
   loss,
+  evalLoss,
   elapsed,
-  isTraining,
 }: TrainStatusProps) {
   return (
-    <div className="grid grid-cols-3 gap-4 rounded-lg border bg-muted/30 px-5 py-3.5">
+    <div className="grid grid-cols-4 gap-4 rounded-lg border bg-muted/30 px-5 py-3.5">
       <Stat label="Step">
         <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
           {step.toLocaleString()}
@@ -42,9 +42,15 @@ export function TrainStatus({
         </span>
       </Stat>
 
-      <Stat label={isTraining ? "Current loss" : "Final loss"}>
+      <Stat label="Train loss">
         <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
           {loss > 0 ? loss.toFixed(4) : "—"}
+        </span>
+      </Stat>
+
+      <Stat label="Eval loss">
+        <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
+          {evalLoss !== undefined && evalLoss > 0 ? evalLoss.toFixed(4) : "—"}
         </span>
       </Stat>
 

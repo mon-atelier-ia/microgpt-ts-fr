@@ -7,22 +7,11 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-export type LossPoint = { step: number; loss: number };
-
-const MAX_CHART_POINTS = 200;
-
-function downsample(points: LossPoint[]): LossPoint[] {
-  if (points.length <= MAX_CHART_POINTS) return points;
-  const every = Math.ceil(points.length / MAX_CHART_POINTS);
-  const result: LossPoint[] = [];
-  for (let i = 0; i < points.length; i += every) result.push(points[i]);
-  if (result[result.length - 1] !== points[points.length - 1])
-    result.push(points[points.length - 1]);
-  return result;
-}
+export type LossPoint = { step: number; loss: number; evalLoss?: number };
 
 const lossChartConfig = {
-  loss: { label: "Loss", color: "var(--chart-1)" },
+  loss: { label: "Train", color: "var(--chart-1)" },
+  evalLoss: { label: "Eval", color: "var(--chart-2)" },
 } satisfies ChartConfig;
 
 export function LossChart({
@@ -32,13 +21,13 @@ export function LossChart({
   data: LossPoint[];
   numSteps: number;
 }) {
-  const display = downsample(data);
   const yMax = data.length > 0 ? Math.ceil(data[0].loss) : 4;
+  const hasEval = data.some((p) => p.evalLoss !== undefined);
   return (
     <Card size="sm" className="rounded-lg">
       <CardContent className="pt-4">
         <ChartContainer config={lossChartConfig} className="h-56 w-full">
-          <AreaChart data={display} accessibilityLayer>
+          <AreaChart data={data} accessibilityLayer>
             <defs>
               <linearGradient id="lossGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop
@@ -76,16 +65,10 @@ export function LossChart({
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  hideIndicator
                   labelFormatter={(_, payload) => {
                     const p = payload?.[0]?.payload as LossPoint | undefined;
                     return p ? `Step ${p.step}` : "";
                   }}
-                  formatter={(value) => (
-                    <span className="font-mono font-medium tabular-nums">
-                      {(value as number).toFixed(4)}
-                    </span>
-                  )}
                 />
               }
             />
@@ -95,7 +78,20 @@ export function LossChart({
               stroke="var(--color-loss)"
               strokeWidth={2}
               fill="url(#lossGradient)"
+              isAnimationActive={false}
             />
+            {hasEval && (
+              <Area
+                dataKey="evalLoss"
+                type="monotone"
+                stroke="var(--color-evalLoss)"
+                strokeWidth={2}
+                fill="none"
+                dot={{ r: 2, fill: "var(--color-evalLoss)" }}
+                connectNulls
+                isAnimationActive={false}
+              />
+            )}
           </AreaChart>
         </ChartContainer>
       </CardContent>
