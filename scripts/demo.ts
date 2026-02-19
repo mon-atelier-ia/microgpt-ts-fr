@@ -6,7 +6,12 @@ import {
   inference,
   initStateDict,
 } from "../microgpt/model";
-import { DEFAULT_ADAM_CONFIG, emaSmooth, initAdamState, trainStep } from "../microgpt/train";
+import {
+  DEFAULT_ADAM_CONFIG,
+  emaSmooth,
+  initAdamState,
+  trainStep,
+} from "../microgpt/train";
 import { parseDocs } from "../microgpt/utils";
 
 const DATASET_URL =
@@ -45,7 +50,14 @@ const startTime = Date.now();
 let smoothLoss: number | undefined;
 for (let step = 0; step < TRAIN_STEPS; step++) {
   const tokens = tokenizer.encode(docs[step % docs.length]);
-  const info = trainStep(stateDict, adamState, tokens, step, TRAIN_STEPS, adamConfig);
+  const info = trainStep(
+    stateDict,
+    adamState,
+    tokens,
+    step,
+    TRAIN_STEPS,
+    adamConfig,
+  );
   smoothLoss = emaSmooth(smoothLoss, info.loss);
   if (step < 5 || step % 200 === 0) {
     console.log(

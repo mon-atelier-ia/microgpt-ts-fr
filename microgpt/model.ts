@@ -1,10 +1,14 @@
 import {
+  dotProduct,
   gaussianMatrix,
   gaussianMatrixList,
   init2dList,
+  linear,
   mean,
   sample,
   sum,
+  transpose,
+  vectorAdd,
 } from "./utils";
 import type { Value } from "./value";
 
@@ -79,22 +83,6 @@ export function initStateDict(
 // Flatten state dict into a flat list of Value params
 export function getParams(stateDict: StateDict): Value[] {
   return Object.values(stateDict).flat(3);
-}
-
-function linear(x: Value[], w: Value[][]): Value[] {
-  return w.map((wo) => sum(wo.map((wi, i) => wi.mul(x[i]))));
-}
-
-function dotProduct(a: Value[], b: Value[]): Value {
-  return sum(a.map((ai, i) => ai.mul(b[i])));
-}
-
-function vectorAdd(a: Value[], b: Value[]): Value[] {
-  return a.map((ai, i) => ai.add(b[i]));
-}
-
-function transpose(matrix: Value[][]): Value[][] {
-  return matrix[0].map((_, i) => matrix.map((row) => row[i]));
 }
 
 // Softmax function: exp(x) / sum(exp(x))

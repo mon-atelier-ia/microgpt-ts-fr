@@ -6,8 +6,6 @@ import {
   type StateDict,
 } from "./model";
 
-const EMA_ALPHA = 0.1;
-
 export type AdamConfig = {
   learningRate: number;
   beta1: number;
@@ -34,12 +32,6 @@ export type StepInfo = {
   smoothLoss: number;
   lr: number;
 };
-
-export function emaSmooth(prev: number | undefined, value: number): number {
-  return prev === undefined
-    ? value
-    : (1 - EMA_ALPHA) * prev + EMA_ALPHA * value;
-}
 
 export const initAdamState = (nParams: number): AdamState => ({
   m: new Array(nParams).fill(0),

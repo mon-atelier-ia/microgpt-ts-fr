@@ -1,7 +1,7 @@
 import {
   type NumericStateDict,
   restoreStateDict,
-} from "../../microgpt/eval-serialize";
+} from "../../microgpt/browser";
 import { forward, type ModelConfig } from "../../microgpt/model";
 
 type EvalMsg = {

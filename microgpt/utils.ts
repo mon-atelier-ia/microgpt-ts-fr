@@ -1,9 +1,29 @@
 import { Value } from "./value";
 
+const EMA_ALPHA = 0.1;
+
 export const sum = (arr: Value[]): Value =>
   arr.reduce((a, b) => a.add(b), new Value(0));
 
 export const mean = (arr: Value[]): Value => sum(arr).div(arr.length);
+
+export const linear = (x: Value[], w: Value[][]): Value[] =>
+  w.map((wo) => sum(wo.map((wi, i) => wi.mul(x[i]))));
+
+export const dotProduct = (a: Value[], b: Value[]): Value =>
+  sum(a.map((ai, i) => ai.mul(b[i])));
+
+export const vectorAdd = (a: Value[], b: Value[]): Value[] =>
+  a.map((ai, i) => ai.add(b[i]));
+
+export const transpose = (matrix: Value[][]): Value[][] =>
+  matrix[0].map((_, i) => matrix.map((row) => row[i]));
+
+export const emaSmooth = (prev: number | undefined, value: number): number =>
+  prev === undefined ? value : (1 - EMA_ALPHA) * prev + EMA_ALPHA * value;
+
+export const init2dList = <T>(count: number): T[][] =>
+  Array.from({ length: count }, () => []);
 
 // Sample from a probability distribution using cumulative weights
 // Assumes weights are normalized to sum to 1
@@ -51,9 +71,6 @@ export function shuffle<T>(arr: T[]): T[] {
   }
   return arr;
 }
-
-export const init2dList = <T>(count: number): T[][] =>
-  Array.from({ length: count }, () => []);
 
 export function parseDocs(text: string): string[] {
   const docs = text
