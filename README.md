@@ -2,7 +2,9 @@
 
 A TypeScript port of Andrej Karpathy's [microgpt](https://gist.github.com/karpathy/8627fe009c40f57531cb18360106ce95) — a complete GPT built from scratch with **zero runtime dependencies**. Supports training and inference.
 
-No PyTorch. No TensorFlow. Just TypeScript, and ~400 lines of code.
+No PyTorch. No TensorFlow. Just TypeScript, and ~400 lines of code. Runs in the browser.
+
+**Try the live playground: [microgpt-ts.vercel.app](https://microgpt-ts.vercel.app/)**
 
 ## What is this?
 
@@ -41,6 +43,20 @@ sample  3: rian
 sample  4: kanani
 sample  5: dahe
 ```
+
+## Web App
+
+An interactive browser playground that trains and runs the GPT entirely client-side — no server needed. Built with Next.js, shadcn/ui, and Tailwind CSS.
+
+**Try it live: [microgpt-ts.vercel.app](https://microgpt-ts.vercel.app/)**
+
+```bash
+cd web
+pnpm install
+pnpm dev
+```
+
+Head to `/playground` to train a model and generate names in real time.
 
 ## Structure
 
