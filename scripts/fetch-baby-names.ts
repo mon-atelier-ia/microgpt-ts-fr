@@ -25,7 +25,9 @@ const allNames = text
 
 console.log(`Fetched ${allNames.length} names total`);
 
-const sampled = shuffle(allNames.slice()).slice(0, SAMPLE_SIZE);
+const sampled = shuffle(allNames.slice())
+  .slice(0, SAMPLE_SIZE)
+  .sort((a, b) => a.localeCompare(b));
 
 mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
 writeFileSync(OUTPUT_PATH, toTsArrayFile("babyNames", sampled), "utf-8");
