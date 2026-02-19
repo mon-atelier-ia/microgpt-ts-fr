@@ -10,7 +10,7 @@ type ExploreViewProps = {
   vocabLabels: string[];
   done: boolean;
   BOS: number;
-  blockSize: number;
+  prefixChars?: string[];
 };
 
 export function ExploreView({
@@ -18,11 +18,24 @@ export function ExploreView({
   vocabLabels,
   done,
   BOS,
-  blockSize,
+  prefixChars = [],
 }: ExploreViewProps) {
   if (steps.length === 0) {
     return (
-      <div className="flex items-center justify-center rounded-lg border border-dashed py-16">
+      <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed py-16">
+        {prefixChars.length > 0 && (
+          <div className="flex gap-2 mb-2">
+            {prefixChars.map((char, i) => (
+              <div
+                // biome-ignore lint/suspicious/noArrayIndexKey: prefix is static
+                key={i}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed bg-muted/50 font-mono text-base text-muted-foreground"
+              >
+                {char}
+              </div>
+            ))}
+          </div>
+        )}
         <p className="text-sm text-muted-foreground">
           Click Next Token to begin
         </p>
@@ -34,51 +47,69 @@ export function ExploreView({
   const wordChars = steps
     .filter((s) => s.tokenId !== BOS)
     .map((s) => vocabLabels[s.tokenId]);
+  const totalChars = prefixChars.length + wordChars.length;
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Growing word display */}
-      <div className="flex flex-wrap gap-2">
-        {wordChars.map((char, i) => {
-          const isLatest = !done && i === wordChars.length - 1;
-          return (
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-2">
+        <p className="text-sm font-medium">Sample output</p>
+        <div className="flex flex-wrap gap-2">
+          {prefixChars.map((char, i) => (
+            <div
+              // biome-ignore lint/suspicious/noArrayIndexKey: prefix is static
+              key={`pfx-${i}`}
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-dashed bg-muted/50 font-mono text-base text-muted-foreground"
+            >
+              {char}
+            </div>
+          ))}
+          {wordChars.map((char, i) => {
+            const isLatest = !done && i === wordChars.length - 1;
+            return (
+              <motion.div
+                // biome-ignore lint/suspicious/noArrayIndexKey: chars grow monotonically
+                key={i}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                className={`flex h-10 w-10 items-center justify-center rounded-lg border font-mono text-base ${
+                  isLatest ? "ring-2 ring-primary text-primary" : ""
+                }`}
+              >
+                {char}
+              </motion.div>
+            );
+          })}
+          {done && (
             <motion.div
-              // biome-ignore lint/suspicious/noArrayIndexKey: chars grow monotonically
-              key={i}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", damping: 20, stiffness: 300 }}
-              className={`flex h-10 w-10 items-center justify-center rounded-lg border font-mono text-base ${
-                isLatest ? "ring-2 ring-primary text-primary" : ""
-              }`}
+              className="flex items-center"
             >
-              {char}
+              <Badge variant="outline">END</Badge>
             </motion.div>
-          );
-        })}
-        {done && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className="flex items-center"
-          >
-            <Badge variant="outline">END</Badge>
-          </motion.div>
-        )}
+          )}
+        </div>
       </div>
 
-      {/* Step indicator */}
-      <p className="text-sm text-muted-foreground">
-        Position {lastStep.posId + 1} / {blockSize}
-      </p>
-
-      {/* Probability bar chart */}
-      <TokenProbChart
-        probs={lastStep.probs}
-        tokenId={lastStep.tokenId}
-        vocabLabels={vocabLabels}
-      />
+      <div className="flex flex-col gap-2">
+        <p className="text-sm font-medium">
+          Token probability distribution{" "}
+          <span className="font-normal text-muted-foreground">
+            — position {totalChars}
+          </span>
+        </p>
+        <TokenProbChart
+          probs={lastStep.probs}
+          tokenId={lastStep.tokenId}
+          vocabLabels={vocabLabels}
+        />
+        <p className="text-xs text-muted-foreground">
+          Each bar shows the probability the model assigns to each character.
+          The highlighted bar was sampled.
+        </p>
+      </div>
     </div>
   );
 }

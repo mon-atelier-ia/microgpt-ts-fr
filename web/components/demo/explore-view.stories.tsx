@@ -4,7 +4,6 @@ import { ExploreView } from "./explore-view";
 
 const VOCAB = [..."abcdefghijklmnopqrstuvwxyz", "·"];
 const BOS = 26;
-const BLOCK_SIZE = 16;
 
 const makeProbs = (peakIdx: number) => {
   const raw = VOCAB.map((_, i) => (i === peakIdx ? 4 : Math.random()));
@@ -30,7 +29,6 @@ const meta: Meta<typeof ExploreView> = {
   args: {
     vocabLabels: VOCAB,
     BOS,
-    blockSize: BLOCK_SIZE,
   },
 };
 
@@ -63,4 +61,19 @@ export const WordComplete: Story = {
     ],
     done: true,
   },
+};
+
+export const WithPrefix: Story = {
+  args: {
+    steps: [
+      makeStep(2, 11, [4, 11]), // 'l' (prefix fed 'e','l')
+      makeStep(3, 14, [4, 11, 11]), // 'o'
+    ],
+    done: false,
+    prefixChars: ["e", "l"],
+  },
+};
+
+export const EmptyWithPrefix: Story = {
+  args: { steps: [], done: false, prefixChars: ["a", "n"] },
 };

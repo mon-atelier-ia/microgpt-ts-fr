@@ -16,7 +16,7 @@ export function GenerateTab({
   exploreDone,
   vocabLabels,
   BOS,
-  blockSize,
+  prefixChars,
   onSwitchToTrain,
 }: {
   status: Status;
@@ -27,7 +27,7 @@ export function GenerateTab({
   exploreDone: boolean;
   vocabLabels: string[];
   BOS: number;
-  blockSize: number;
+  prefixChars: string[];
   onSwitchToTrain: () => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -58,7 +58,7 @@ export function GenerateTab({
         vocabLabels={vocabLabels}
         done={exploreDone}
         BOS={BOS}
-        blockSize={blockSize}
+        prefixChars={prefixChars}
       />
     );
   }
