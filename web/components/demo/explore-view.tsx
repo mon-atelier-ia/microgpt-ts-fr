@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Badge } from "@/components/ui/badge";
 import type { InferenceStep } from "../../../microgpt/model";
 import { TokenProbChart } from "./token-prob-chart";
 
@@ -87,7 +86,9 @@ export function ExploreView({
               transition={{ type: "spring", damping: 20, stiffness: 300 }}
               className="flex items-center"
             >
-              <Badge variant="outline">END</Badge>
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg border font-mono text-base">
+                .
+              </div>
             </motion.div>
           )}
         </div>
