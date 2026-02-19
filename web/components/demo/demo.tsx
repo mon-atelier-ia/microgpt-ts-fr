@@ -190,7 +190,7 @@ export function TrainDemo() {
     const result = generatorRef.current.next();
     if (result.done) return;
     setExploreSteps((prev) => [...prev, result.value]);
-    if (result.value.sampledId === tokenizer.BOS) {
+    if (result.value.tokenId === tokenizer.BOS) {
       setExploreDone(true);
       generatorRef.current = null;
     }

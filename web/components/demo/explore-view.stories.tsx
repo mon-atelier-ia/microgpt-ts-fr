@@ -14,13 +14,13 @@ const makeProbs = (peakIdx: number) => {
 
 const makeStep = (
   posId: number,
-  sampledId: number,
-  tokensSoFar: number[],
+  tokenId: number,
+  prevTokens: number[],
 ): InferenceStep => ({
   posId,
-  probs: makeProbs(sampledId),
-  sampledId,
-  tokensSoFar,
+  probs: makeProbs(tokenId),
+  tokenId,
+  prevTokens,
 });
 
 const meta: Meta<typeof ExploreView> = {

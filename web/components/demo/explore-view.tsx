@@ -32,8 +32,8 @@ export function ExploreView({
 
   const lastStep = steps[steps.length - 1];
   const wordChars = steps
-    .filter((s) => s.sampledId !== BOS)
-    .map((s) => vocabLabels[s.sampledId]);
+    .filter((s) => s.tokenId !== BOS)
+    .map((s) => vocabLabels[s.tokenId]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -49,9 +49,7 @@ export function ExploreView({
               animate={{ opacity: 1, scale: 1 }}
               transition={{ type: "spring", damping: 20, stiffness: 300 }}
               className={`flex h-10 w-10 items-center justify-center rounded-lg border font-mono text-base ${
-                isLatest
-                  ? "ring-2 ring-primary text-primary"
-                  : ""
+                isLatest ? "ring-2 ring-primary text-primary" : ""
               }`}
             >
               {char}
@@ -78,7 +76,7 @@ export function ExploreView({
       {/* Probability bar chart */}
       <TokenProbChart
         probs={lastStep.probs}
-        sampledId={lastStep.sampledId}
+        tokenId={lastStep.tokenId}
         vocabLabels={vocabLabels}
       />
     </div>

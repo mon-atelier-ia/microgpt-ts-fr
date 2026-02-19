@@ -4,13 +4,13 @@ import { motion } from "motion/react";
 
 type TokenProbChartProps = {
   probs: number[];
-  sampledId: number;
+  tokenId: number;
   vocabLabels: string[];
 };
 
 export function TokenProbChart({
   probs,
-  sampledId,
+  tokenId,
   vocabLabels,
 }: TokenProbChartProps) {
   const maxProb = Math.max(...probs);
@@ -19,7 +19,7 @@ export function TokenProbChart({
     <div className="flex flex-col gap-1">
       <div className="flex h-48 items-end gap-px">
         {probs.map((prob, i) => {
-          const isSampled = i === sampledId;
+          const isSampled = i === tokenId;
           const heightPct = maxProb > 0 ? (prob / maxProb) * 100 : 0;
           return (
             <motion.div
@@ -40,7 +40,7 @@ export function TokenProbChart({
       </div>
       <div className="flex gap-px">
         {vocabLabels.map((label, i) => {
-          const isSampled = i === sampledId;
+          const isSampled = i === tokenId;
           return (
             <span
               // biome-ignore lint/suspicious/noArrayIndexKey: vocab order is fixed

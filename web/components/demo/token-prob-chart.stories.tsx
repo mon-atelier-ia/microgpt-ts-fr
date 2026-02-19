@@ -20,7 +20,7 @@ type Story = StoryObj<typeof TokenProbChart>;
 export const Default: Story = {
   args: {
     probs: makeProbs(0),
-    sampledId: 0,
+    tokenId: 0,
     vocabLabels: VOCAB,
   },
 };
@@ -28,7 +28,7 @@ export const Default: Story = {
 export const MidWordSample: Story = {
   args: {
     probs: makeProbs(13),
-    sampledId: 13,
+    tokenId: 13,
     vocabLabels: VOCAB,
   },
 };
@@ -36,7 +36,7 @@ export const MidWordSample: Story = {
 export const EOSToken: Story = {
   args: {
     probs: makeProbs(26),
-    sampledId: 26,
+    tokenId: 26,
     vocabLabels: VOCAB,
   },
 };
