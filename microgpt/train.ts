@@ -4,17 +4,20 @@ import {
   getParams,
   type ModelConfig,
   type StateDict,
-  type Tokenizer,
 } from "./model";
-import type { Value } from "./value";
-
-const EMA_ALPHA = 0.01;
 
 export type AdamConfig = {
   learningRate: number;
   beta1: number;
   beta2: number;
   eps: number;
+};
+
+export const DEFAULT_ADAM_CONFIG: AdamConfig = {
+  learningRate: 0.01,
+  beta1: 0.85,
+  beta2: 0.99,
+  eps: 1e-8,
 };
 
 export type AdamState = {
@@ -30,31 +33,22 @@ export type StepInfo = {
   lr: number;
 };
 
-export function emaSmooth(prev: number | undefined, value: number): number {
-  return prev === undefined
-    ? value
-    : (1 - EMA_ALPHA) * prev + EMA_ALPHA * value;
-}
+export const initAdamState = (nParams: number): AdamState => ({
+  m: new Array(nParams).fill(0),
+  v: new Array(nParams).fill(0),
+});
 
-export const initAdamState = (nParams: number): AdamState => {
-  return {
-    m: Array.from({ length: nParams }, () => 0),
-    v: Array.from({ length: nParams }, () => 0),
-  };
-};
-
-// Single training step. Returns step info for observability.
 export function trainStep(
-  params: Value[],
   stateDict: StateDict,
   adamState: AdamState,
   tokens: number[],
   step: number,
   numSteps: number,
-  config: AdamConfig,
+  adamConfig: AdamConfig,
   modelConfig: ModelConfig = DEFAULT_CONFIG,
 ): StepInfo {
-  const { learningRate, beta1, beta2, eps } = config;
+  const params = getParams(stateDict);
+  const { learningRate, beta1, beta2, eps } = adamConfig;
 
   // Forward pass (builds computation graph)
   const loss = forward(stateDict, tokens, modelConfig);
@@ -74,38 +68,4 @@ export function trainStep(
   });
 
   return { step, numSteps, loss: loss.data, smoothLoss: 0, lr };
-}
-
-export function train(
-  stateDict: StateDict,
-  adamState: AdamState,
-  docs: string[],
-  tokenizer: Tokenizer,
-  numSteps: number,
-  config: AdamConfig,
-  modelConfig: ModelConfig = DEFAULT_CONFIG,
-  onStep?: (info: StepInfo) => void,
-) {
-  const params = getParams(stateDict);
-  let smoothLoss: number | undefined;
-
-  for (let step = 0; step < numSteps; step++) {
-    const doc = docs[step % docs.length];
-    const tokens = tokenizer.encode(doc);
-    const info = trainStep(
-      params,
-      stateDict,
-      adamState,
-      tokens,
-      step,
-      numSteps,
-      config,
-      modelConfig,
-    );
-
-    smoothLoss = emaSmooth(smoothLoss, info.loss);
-    info.smoothLoss = smoothLoss;
-
-    if (onStep) onStep(info);
-  }
 }

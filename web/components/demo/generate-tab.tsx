@@ -1,18 +1,33 @@
+"use client";
+
 import { motion } from "motion/react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-
-type Status = "idle" | "training" | "trained";
+import type { InferenceStep } from "../../../microgpt/model";
+import { ExploreView } from "./explore-view";
+import type { GenerateMode, Status } from "./types";
 
 export function GenerateTab({
   status,
+  mode,
   output,
   isGenerating,
+  exploreSteps,
+  exploreDone,
+  vocabLabels,
+  BOS,
+  prefixChars,
   onSwitchToTrain,
 }: {
   status: Status;
+  mode: GenerateMode;
   output: string[];
   isGenerating: boolean;
+  exploreSteps: InferenceStep[];
+  exploreDone: boolean;
+  vocabLabels: string[];
+  BOS: number;
+  prefixChars: string[];
   onSwitchToTrain: () => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -33,6 +48,18 @@ export function GenerateTab({
           Go to Train
         </Button>
       </div>
+    );
+  }
+
+  if (mode === "explore") {
+    return (
+      <ExploreView
+        steps={exploreSteps}
+        vocabLabels={vocabLabels}
+        done={exploreDone}
+        BOS={BOS}
+        prefixChars={prefixChars}
+      />
     );
   }
 

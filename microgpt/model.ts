@@ -1,10 +1,14 @@
 import {
+  dotProduct,
   gaussianMatrix,
   gaussianMatrixList,
   init2dList,
+  linear,
   mean,
   sample,
   sum,
+  transpose,
+  vectorAdd,
 } from "./utils";
 import type { Value } from "./value";
 
@@ -81,23 +85,6 @@ export function getParams(stateDict: StateDict): Value[] {
   return Object.values(stateDict).flat(3);
 }
 
-// Linear transformation: W * x
-function linear(x: Value[], w: Value[][]): Value[] {
-  return w.map((wo) => sum(wo.map((wi, i) => wi.mul(x[i]))));
-}
-
-function dotProduct(a: Value[], b: Value[]): Value {
-  return sum(a.map((ai, i) => ai.mul(b[i])));
-}
-
-function vectorAdd(a: Value[], b: Value[]): Value[] {
-  return a.map((ai, i) => ai.add(b[i]));
-}
-
-function transpose(matrix: Value[][]): Value[][] {
-  return matrix[0].map((_, i) => matrix.map((row) => row[i]));
-}
-
 // Softmax function: exp(x) / sum(exp(x))
 // Subtract the maximum value to avoid overflow
 function softmax(logits: Value[]): Value[] {
@@ -107,11 +94,9 @@ function softmax(logits: Value[]): Value[] {
   return exps.map((e) => e.div(total));
 }
 
-// Loss function: -log(prob)
 const lossFn = (prob: Value): Value => prob.log().neg();
 
-// RMSNorm normalization: (x^2 + 1e-5)^-0.5
-export function rmsnorm(x: Value[]): Value[] {
+function rmsnorm(x: Value[]): Value[] {
   const ms = mean(x.map((xi) => xi.pow(2)));
   const scale = ms.add(1e-5).pow(-0.5);
   return x.map((xi) => xi.mul(scale));
@@ -194,31 +179,66 @@ export function forward(
   return mean(losses);
 }
 
+export type InferenceStep = {
+  posId: number;
+  probs: number[]; // post-temperature softmax, one per vocab token
+  tokenId: number; // the token that was sampled
+  prevTokens: number[]; // all tokens generated so far (excluding BOS)
+};
+
+export function* inferenceStepwise(
+  stateDict: StateDict,
+  tokenizer: Tokenizer,
+  temperature = 0.5,
+  config: ModelConfig = DEFAULT_CONFIG,
+  prefixTokens: number[] = [],
+): Generator<InferenceStep> {
+  const { BOS } = tokenizer;
+  let tokenId = BOS;
+  const tokens: number[] = [];
+  const keys: Value[][][] = init2dList(config.nLayer);
+  const values: Value[][][] = init2dList(config.nLayer);
+
+  // Feed prefix tokens deterministically (build KV cache, no sampling)
+  for (let i = 0; i < prefixTokens.length; i++) {
+    gpt(stateDict, tokenId, i, keys, values, config);
+    tokenId = prefixTokens[i];
+    tokens.push(tokenId);
+  }
+
+  for (let posId = prefixTokens.length; posId < config.blockSize; posId++) {
+    const logits = gpt(stateDict, tokenId, posId, keys, values, config);
+    const scaled =
+      temperature === 0 ? logits : logits.map((l) => l.div(temperature));
+    const probs = softmax(scaled).map((p) => p.data);
+    const nextId =
+      temperature === 0
+        ? probs.reduce((best, p, i, arr) => (p > arr[best] ? i : best), 0)
+        : sample(probs);
+    yield { posId, probs, tokenId: nextId, prevTokens: [...tokens] };
+    if (nextId === BOS) break;
+    tokens.push(nextId);
+    tokenId = nextId;
+  }
+}
+
 // Generate a single sample string from the model
 export function inference(
   stateDict: StateDict,
   tokenizer: Tokenizer,
   temperature = 0.5,
   config: ModelConfig = DEFAULT_CONFIG,
+  prefixTokens: number[] = [],
 ): string {
-  const { BOS, decode } = tokenizer;
-  let tokenId = BOS;
-  const tokens: number[] = [];
-  const keys: Value[][][] = init2dList(config.nLayer);
-  const values: Value[][][] = init2dList(config.nLayer);
-  for (let posId = 0; posId < config.blockSize; posId++) {
-    const logits = gpt(stateDict, tokenId, posId, keys, values, config);
-    if (temperature === 0) {
-      tokenId = logits.reduce(
-        (best, l, i, arr) => (l.data > arr[best].data ? i : best),
-        0,
-      );
-    } else {
-      const probs = softmax(logits.map((l) => l.div(temperature)));
-      tokenId = sample(probs.map((p) => p.data));
-    }
-    if (tokenId === BOS) break;
-    tokens.push(tokenId);
+  let tokens: number[] = [];
+  for (const step of inferenceStepwise(
+    stateDict,
+    tokenizer,
+    temperature,
+    config,
+    prefixTokens,
+  )) {
+    tokens = step.prevTokens;
   }
-  return decode(tokens);
+  return tokenizer.decode(tokens);
 }

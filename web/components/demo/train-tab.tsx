@@ -4,13 +4,13 @@ import type { LossPoint } from "./loss-chart";
 import { LossChart } from "./loss-chart";
 import type { TrainingConfig } from "./train-sidebar";
 import { TrainStatus } from "./train-status";
-
-type Status = "idle" | "training" | "trained";
+import { SECTION_LABEL, type Status } from "./types";
 
 export function TrainTab({
   status,
   step,
   loss,
+  evalLoss,
   elapsed,
   trainingConfig,
   lossHistory,
@@ -19,6 +19,7 @@ export function TrainTab({
   status: Status;
   step: number;
   loss: number;
+  evalLoss?: number;
   elapsed: number;
   trainingConfig: TrainingConfig;
   lossHistory: LossPoint[];
@@ -42,16 +43,18 @@ export function TrainTab({
         step={step}
         numSteps={trainingConfig.numSteps}
         loss={loss}
+        evalLoss={evalLoss}
         elapsed={elapsed}
-        isTraining={isTraining}
       />
 
       {lossHistory.length > 1 && (
         <div className="flex flex-col gap-2">
-          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Training Loss
-          </p>
-          <LossChart data={lossHistory} numSteps={trainingConfig.numSteps} />
+          <p className={SECTION_LABEL}>Loss</p>
+          <LossChart
+            data={lossHistory}
+            numSteps={trainingConfig.numSteps}
+            isTraining={isTraining}
+          />
         </div>
       )}
 
