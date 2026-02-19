@@ -1,7 +1,6 @@
 import { snapshotWeights } from "./eval-serialize";
 import {
   DEFAULT_CONFIG,
-  getParams,
   type ModelConfig,
   type StateDict,
   type Tokenizer,
@@ -27,26 +26,29 @@ export type EvalInfo = {
   smoothEvalLoss: number;
 };
 
+export type EvalConfig = {
+  docs: string[];
+  onEval: (info: EvalInfo) => void;
+  workerUrl: URL;
+};
+
 export function trainAsync(
   stateDict: StateDict,
   adamState: AdamState,
   docs: string[],
   tokenizer: Tokenizer,
   numSteps: number,
-  config: AdamConfig,
+  adamConfig: AdamConfig,
   modelConfig: ModelConfig = DEFAULT_CONFIG,
   onStep: (info: StepInfo) => void,
-  evalDocs?: string[],
-  onEval?: (info: EvalInfo) => void,
-  evalWorkerUrl?: URL,
+  evalConfig?: EvalConfig,
 ): TrainHandle {
-  const params = getParams(stateDict);
   const evalInterval = Math.max(1, Math.round(numSteps * 0.05));
   let aborted = false;
   let smoothLoss: number | undefined;
   let smoothEvalLoss: number | undefined;
 
-  const encodedEvalDocs = evalDocs?.map((doc) => tokenizer.encode(doc));
+  const encodedEvalDocs = evalConfig?.docs.map((doc) => tokenizer.encode(doc));
   let worker: Worker | null = null;
   let evalId = 0;
   let latestEvalId = -1;
@@ -54,13 +56,8 @@ export function trainAsync(
   let onDrain: (() => void) | null = null;
   const evalStepMap: Record<number, number> = {};
 
-  if (
-    encodedEvalDocs &&
-    encodedEvalDocs.length > 0 &&
-    onEval &&
-    evalWorkerUrl
-  ) {
-    worker = new Worker(evalWorkerUrl);
+  if (encodedEvalDocs && encodedEvalDocs.length > 0 && evalConfig) {
+    worker = new Worker(evalConfig.workerUrl);
     worker.onmessage = (e: MessageEvent<{ id: number; avgLoss: number }>) => {
       inflight--;
       if (e.data.id <= latestEvalId) {
@@ -69,7 +66,7 @@ export function trainAsync(
       }
       latestEvalId = e.data.id;
       smoothEvalLoss = emaSmooth(smoothEvalLoss, e.data.avgLoss);
-      onEval({
+      evalConfig.onEval({
         evalStep: evalStepMap[e.data.id],
         evalLoss: e.data.avgLoss,
         smoothEvalLoss,
@@ -98,13 +95,12 @@ export function trainAsync(
         const doc = docs[step % docs.length];
         const tokens = tokenizer.encode(doc);
         const info = trainStep(
-          params,
           stateDict,
           adamState,
           tokens,
           step,
           numSteps,
-          config,
+          adamConfig,
           modelConfig,
         );
         smoothLoss = emaSmooth(smoothLoss, info.loss);

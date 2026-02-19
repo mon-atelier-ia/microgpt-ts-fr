@@ -7,7 +7,7 @@ import {
   inference,
   initStateDict,
 } from "../microgpt/model";
-import { initAdamState, train } from "../microgpt/train";
+import { DEFAULT_ADAM_CONFIG, initAdamState, train } from "../microgpt/train";
 import { parseDocs } from "../microgpt/utils";
 
 const DATASET_URL =
@@ -16,13 +16,7 @@ const INPUT_PATH = "./tmp/input.txt";
 const NUM_SAMPLES = 20;
 const TRAIN_STEPS = 1000;
 
-// Adam optimizer config
-const ADAM_CONFIG = {
-  learningRate: 0.01,
-  beta1: 0.85,
-  beta2: 0.99,
-  eps: 1e-8,
-};
+const adamConfig = DEFAULT_ADAM_CONFIG;
 
 async function loadDocuments(): Promise<string[]> {
   if (!existsSync(INPUT_PATH)) {
@@ -55,7 +49,7 @@ train(
   docs,
   tokenizer,
   TRAIN_STEPS,
-  ADAM_CONFIG,
+  adamConfig,
   DEFAULT_CONFIG,
   (info) => {
     if (info.step < 5 || info.step % 200 === 0) {

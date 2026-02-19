@@ -17,8 +17,8 @@ import {
   type Tokenizer,
 } from "../../../microgpt/model";
 import {
-  type AdamConfig,
   type AdamState,
+  DEFAULT_ADAM_CONFIG,
   initAdamState,
 } from "../../../microgpt/train";
 import { parseDocs, splitDocs } from "../../../microgpt/utils";
@@ -115,19 +115,12 @@ export function TrainDemo() {
     const stateDict = initStateDict(tokenizer.vocabSize, modelConfig);
     const adamState = initAdamState(getParams(stateDict).length);
 
-    const adamConfig: AdamConfig = {
+    const adamConfig = {
+      ...DEFAULT_ADAM_CONFIG,
       learningRate: trainingConfig.learningRate,
-      beta1: 0.85,
-      beta2: 0.99,
-      eps: 1e-8,
     };
 
     modelRef.current = { stateDict, adamState, tokenizer, modelConfig };
-
-    const evalWorkerUrl = new URL(
-      "../../workers/eval-worker.ts",
-      import.meta.url,
-    );
 
     const handle = trainAsync(
       stateDict,
@@ -165,15 +158,17 @@ export function TrainDemo() {
           });
         }
       },
-      evalDocsSplit,
-      (evalInfo) => {
-        setEvalLoss(evalInfo.evalLoss);
-        const evalS = evalInfo.evalStep + 1;
-        const target = lossBufferRef.current.find((p) => p.step === evalS);
-        if (target) target.evalLoss = evalInfo.evalLoss;
-        setLossHistory([...lossBufferRef.current]);
+      {
+        docs: evalDocsSplit,
+        onEval: (evalInfo) => {
+          setEvalLoss(evalInfo.evalLoss);
+          const evalS = evalInfo.evalStep + 1;
+          const target = lossBufferRef.current.find((p) => p.step === evalS);
+          if (target) target.evalLoss = evalInfo.evalLoss;
+          setLossHistory([...lossBufferRef.current]);
+        },
+        workerUrl: new URL("../../workers/eval-worker.ts", import.meta.url),
       },
-      evalWorkerUrl,
     );
     handleRef.current = handle;
 
