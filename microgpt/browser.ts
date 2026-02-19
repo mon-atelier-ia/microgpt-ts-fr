@@ -1,5 +1,6 @@
 import {
   DEFAULT_CONFIG,
+  forward,
   getParams,
   type ModelConfig,
   type StateDict,
@@ -12,8 +13,10 @@ import {
   type StepInfo,
   trainStep,
 } from "./train";
+import { mean } from "./utils";
 
 const CHUNK_SIZE = 10;
+const EVAL_INTERVAL = 50;
 
 export type TrainHandle = {
   promise: Promise<void>;
@@ -29,10 +32,12 @@ export function trainAsync(
   config: AdamConfig,
   modelConfig: ModelConfig = DEFAULT_CONFIG,
   onStep: (info: StepInfo) => void,
+  evalDocs?: string[],
 ): TrainHandle {
   const params = getParams(stateDict);
   let aborted = false;
   let smoothLoss: number | undefined;
+  let smoothEvalLoss: number | undefined;
 
   const abort = () => {
     aborted = true;
@@ -62,6 +67,22 @@ export function trainAsync(
         );
         smoothLoss = emaSmooth(smoothLoss, info.loss);
         info.smoothLoss = smoothLoss;
+
+        if (
+          evalDocs &&
+          evalDocs.length > 0 &&
+          (step % EVAL_INTERVAL === 0 || step === numSteps - 1)
+        ) {
+          const avgEvalLoss = mean(
+            evalDocs.map((doc) =>
+              forward(stateDict, tokenizer.encode(doc), modelConfig),
+            ),
+          ).data;
+          smoothEvalLoss = emaSmooth(smoothEvalLoss, avgEvalLoss);
+          info.evalLoss = avgEvalLoss;
+          info.smoothEvalLoss = smoothEvalLoss;
+        }
+
         onStep(info);
         step++;
       }

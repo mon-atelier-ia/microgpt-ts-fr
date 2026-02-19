@@ -67,3 +67,15 @@ export function parseDocs(text: string): string[] {
     .filter((line: string) => line.length > 0);
   return shuffle(docs);
 }
+
+export function splitDocs(
+  docs: string[],
+  evalFraction = 0.1,
+): { train: string[]; eval: string[] } {
+  const nEval = Math.max(1, Math.round(docs.length * evalFraction));
+  const shuffledDocs = shuffle(docs);
+  return {
+    train: shuffledDocs.slice(nEval),
+    eval: shuffledDocs.slice(0, nEval),
+  };
+}
