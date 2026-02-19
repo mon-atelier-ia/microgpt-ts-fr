@@ -33,9 +33,7 @@ export function TokenProbChart({
                 className="relative flex-1 min-w-0 flex flex-col items-center justify-end h-full"
               >
                 {showLabel && (
-                  <span
-                    className="text-[9px] font-medium mb-0.5 tabular-nums text-chart-1"
-                  >
+                  <span className="text-[9px] font-medium mb-0.5 tabular-nums text-chart-1">
                     {`${Math.round(prob * 100)}%`}
                   </span>
                 )}
@@ -61,9 +59,7 @@ export function TokenProbChart({
                 // biome-ignore lint/suspicious/noArrayIndexKey: vocab order is fixed
                 key={i}
                 className={`flex-1 min-w-0 text-center text-[10px] leading-none truncate ${
-                  isSampled
-                    ? "font-bold text-chart-1"
-                    : "text-muted-foreground"
+                  isSampled ? "font-bold text-chart-1" : "text-muted-foreground"
                 }`}
               >
                 {label}

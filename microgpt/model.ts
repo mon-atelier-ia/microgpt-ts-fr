@@ -246,7 +246,13 @@ export function inference(
   prefixTokens: number[] = [],
 ): string {
   let tokens: number[] = [];
-  for (const step of inferenceStepwise(stateDict, tokenizer, temperature, config, prefixTokens)) {
+  for (const step of inferenceStepwise(
+    stateDict,
+    tokenizer,
+    temperature,
+    config,
+    prefixTokens,
+  )) {
     tokens = step.prevTokens;
   }
   return tokenizer.decode(tokens);
