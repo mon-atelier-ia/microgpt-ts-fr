@@ -51,7 +51,9 @@ export function ExploreView({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Sample output</p>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Sample output
+        </p>
         <div className="flex flex-wrap gap-2">
           {prefixChars.map((char, i) => (
             <div
@@ -97,9 +99,7 @@ export function ExploreView({
       <div className="flex flex-col gap-2">
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Token probabilities{" "}
-          <span className="font-normal">
-            — position {totalChars}
-          </span>
+          <span className="font-normal">— position {totalChars}</span>
         </p>
         <TokenProbChart
           probs={lastStep.probs}
