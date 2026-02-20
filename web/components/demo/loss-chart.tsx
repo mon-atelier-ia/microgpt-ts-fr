@@ -7,6 +7,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
 
 export type LossPoint = { step: number; loss: number; evalLoss?: number };
 
@@ -19,19 +20,21 @@ export function LossChart({
   data,
   numSteps,
   isTraining,
+  className,
 }: {
   data: LossPoint[];
   numSteps: number;
   isTraining: boolean;
+  className?: string;
 }) {
   const yMax = data.length > 0 ? Math.ceil(data[0].loss) : 4;
   const hasEval = data.some((p) => p.evalLoss !== undefined);
 
   return (
-    <div className="flex flex-col gap-2">
-      <Card size="sm" className="rounded-lg">
-        <CardContent className="pt-4">
-          <ChartContainer config={lossChartConfig} className="h-56 w-full">
+    <div className={cn("flex flex-col gap-2", className)}>
+      <Card size="sm" className="rounded-lg flex-1 min-h-0">
+        <CardContent className="pt-4 flex flex-col flex-1 min-h-0">
+          <ChartContainer config={lossChartConfig} className="h-full w-full">
             <AreaChart data={data} accessibilityLayer>
               <defs>
                 <linearGradient id="lossGradient" x1="0" y1="0" x2="0" y2="1">
@@ -123,7 +126,7 @@ export function LossChart({
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-center gap-5 text-xs text-muted-foreground">
+      <div className="flex shrink-0 items-center justify-center gap-5 text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <svg width="20" height="8" className="shrink-0">
             <line

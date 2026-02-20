@@ -34,7 +34,8 @@ export function TrainStatus({
   elapsed,
 }: TrainStatusProps) {
   return (
-    <div className="grid grid-cols-4 gap-4 rounded-lg border bg-muted/30 px-5 py-3.5">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 rounded-lg border bg-muted/30 px-5 py-3.5">
+      {/* Mobile row 1 left / Desktop col 1 */}
       <Stat label="Step">
         <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
           {step.toLocaleString()}
@@ -45,33 +46,42 @@ export function TrainStatus({
         </span>
       </Stat>
 
-      <Stat
-        label="Train loss"
-        indicator={
-          <span className="inline-block h-2 w-2 rounded-full bg-chart-1" />
-        }
-      >
-        <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
-          {loss > 0 ? loss.toFixed(4) : "—"}
-        </span>
-      </Stat>
+      {/* Mobile row 1 right / Desktop col 4 */}
+      <div className="md:order-4">
+        <Stat label="Time">
+          <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
+            {(elapsed / 1000).toFixed(1)}s
+          </span>
+        </Stat>
+      </div>
 
-      <Stat
-        label="Eval loss"
-        indicator={
-          <span className="inline-block h-2 w-2 rounded-full bg-chart-2" />
-        }
-      >
-        <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
-          {evalLoss !== undefined && evalLoss > 0 ? evalLoss.toFixed(4) : "—"}
-        </span>
-      </Stat>
+      {/* Mobile row 2 left / Desktop col 2 */}
+      <div className="md:order-2">
+        <Stat
+          label="Train loss"
+          indicator={
+            <span className="inline-block h-2 w-2 rounded-full bg-chart-1" />
+          }
+        >
+          <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
+            {loss > 0 ? loss.toFixed(4) : "—"}
+          </span>
+        </Stat>
+      </div>
 
-      <Stat label="Time">
-        <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
-          {(elapsed / 1000).toFixed(1)}s
-        </span>
-      </Stat>
+      {/* Mobile row 2 right / Desktop col 3 */}
+      <div className="md:order-3">
+        <Stat
+          label="Eval loss"
+          indicator={
+            <span className="inline-block h-2 w-2 rounded-full bg-chart-2" />
+          }
+        >
+          <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
+            {evalLoss !== undefined && evalLoss > 0 ? evalLoss.toFixed(4) : "—"}
+          </span>
+        </Stat>
+      </div>
     </div>
   );
 }

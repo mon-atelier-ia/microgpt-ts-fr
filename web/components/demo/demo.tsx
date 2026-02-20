@@ -1,8 +1,8 @@
 "use client";
 
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type TrainHandle, trainAsync } from "../../../microgpt/browser";
 import {
   buildTokenizer,
@@ -45,7 +45,11 @@ type TabId = "dataset" | "train" | "generate";
 // --- Main Demo ---
 
 export function TrainDemo() {
-  const [tab, setTab] = useState<TabId>("dataset");
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const tab = (searchParams.get("tab") ?? "dataset") as TabId;
+  const setTab = (newTab: TabId) => router.replace(`${pathname}?tab=${newTab}`);
   const [selectedPresetId, setSelectedPresetId] = useState("baby-names-simple");
   const [customText, setCustomText] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -98,7 +102,7 @@ export function TrainDemo() {
   const lossBufferRef = useRef<LossPoint[]>([]);
 
   const handleTrain = useCallback(async () => {
-    setTab("train");
+    router.replace(`${pathname}?tab=train`);
     setStatus("training");
     setStep(0);
     setLoss(0);
@@ -177,7 +181,7 @@ export function TrainDemo() {
     handleRef.current = null;
     setLossHistory([...lossBufferRef.current]);
     setStatus((prev) => (prev === "training" ? "trained" : prev));
-  }, [datasetText, modelConfig, trainingConfig]);
+  }, [datasetText, modelConfig, trainingConfig, router, pathname]);
 
   const handleStop = useCallback(() => {
     handleRef.current?.abort();
@@ -265,19 +269,7 @@ export function TrainDemo() {
   const isTrained = status === "trained";
 
   return (
-    <Tabs
-      value={tab}
-      onValueChange={(v) => setTab(v as TabId)}
-      className="flex w-full max-w-5xl flex-1 flex-col min-h-0"
-    >
-      <TabsList className="mb-6 w-full max-w-md self-center">
-        <TabsTrigger value="dataset">Dataset</TabsTrigger>
-        <TabsTrigger value="train">Train</TabsTrigger>
-        <TabsTrigger value="generate" disabled={!isTrained && !isTraining}>
-          Generate
-        </TabsTrigger>
-      </TabsList>
-
+    <div className="flex w-full max-w-5xl flex-1 flex-col min-h-0">
       <div className="flex flex-1 flex-col md:flex-row gap-4 md:gap-8 min-h-0">
         {/* Adaptive sidebar */}
         {tab === "dataset" && (
@@ -302,7 +294,9 @@ export function TrainDemo() {
             onStop={handleStop}
             onSwitchToGenerate={() => {
               setTab("generate");
-              handleGenerate();
+              setGenerateMode("explore");
+              handleResetExplore();
+              handleNextToken();
             }}
           />
         )}
@@ -334,48 +328,54 @@ export function TrainDemo() {
 
         {/* Main content area */}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <TabsContent value="dataset" className="mt-0 flex min-h-0 flex-col">
-            <DatasetTab
-              datasetText={datasetText}
-              customText={customText}
-              selectedPresetId={selectedPresetId}
-              onCustomTextChange={setCustomText}
-            />
-          </TabsContent>
+          {tab === "dataset" && (
+            <div className="flex flex-1 min-h-0 flex-col">
+              <DatasetTab
+                datasetText={datasetText}
+                customText={customText}
+                selectedPresetId={selectedPresetId}
+                onCustomTextChange={setCustomText}
+              />
+            </div>
+          )}
 
-          <TabsContent value="train" className="mt-0">
-            <TrainTab
-              status={status}
-              step={step}
-              loss={loss}
-              evalLoss={evalLoss}
-              elapsed={elapsed}
-              trainingConfig={trainingConfig}
-              lossHistory={lossHistory}
-              liveGenEntries={liveGenEntries}
-            />
-          </TabsContent>
+          {tab === "train" && (
+            <div className="flex flex-1 min-h-0 flex-col">
+              <TrainTab
+                status={status}
+                step={step}
+                loss={loss}
+                evalLoss={evalLoss}
+                elapsed={elapsed}
+                trainingConfig={trainingConfig}
+                lossHistory={lossHistory}
+                liveGenEntries={liveGenEntries}
+              />
+            </div>
+          )}
 
-          <TabsContent value="generate" className="mt-0 flex min-h-0 flex-col">
-            <GenerateTab
-              status={status}
-              mode={generateMode}
-              output={output}
-              isGenerating={isGenerating}
-              exploreSteps={exploreSteps}
-              exploreDone={exploreDone}
-              vocabLabels={
-                modelRef.current
-                  ? [...modelRef.current.tokenizer.chars, "·"]
-                  : []
-              }
-              BOS={modelRef.current?.tokenizer.BOS ?? 0}
-              prefixChars={[...prefix]}
-              onSwitchToTrain={() => setTab("train")}
-            />
-          </TabsContent>
+          {tab === "generate" && (
+            <div className="flex flex-1 min-h-0 flex-col">
+              <GenerateTab
+                status={status}
+                mode={generateMode}
+                output={output}
+                isGenerating={isGenerating}
+                exploreSteps={exploreSteps}
+                exploreDone={exploreDone}
+                vocabLabels={
+                  modelRef.current
+                    ? [...modelRef.current.tokenizer.chars, "·"]
+                    : []
+                }
+                BOS={modelRef.current?.tokenizer.BOS ?? 0}
+                prefixChars={[...prefix]}
+                onSwitchToTrain={() => setTab("train")}
+              />
+            </div>
+          )}
         </div>
       </div>
-    </Tabs>
+    </div>
   );
 }
