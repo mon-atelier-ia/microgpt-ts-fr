@@ -6,7 +6,7 @@ import { toTsArrayFile } from "./utils";
 const URL =
   "https://raw.githubusercontent.com/karpathy/makemore/988aa59/names.txt";
 const OUTPUT_PATH = "./datasets/baby-names.ts";
-const SAMPLE_SIZE = 500;
+const SAMPLE_SIZE = 1000;
 
 const res = await fetch(URL);
 if (!res.ok) {
