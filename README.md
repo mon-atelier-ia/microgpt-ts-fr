@@ -8,7 +8,7 @@ No PyTorch. No TensorFlow. Just TypeScript, ~400 lines of code. Runs in the brow
 
 ## What is this?
 
-A character-level GPT that learns to generate text. Everything is built from scratch: a `Value` class that tracks computations and backpropagates gradients through the chain rule, a GPT architecture (embeddings, multi-head attention, MLP, residual connections, RMSNorm), and an Adam optimizer. Train it on ~32k names and watch it generate new ones.
+A character-level GPT that learns to generate text. Everything is built from scratch: a `Value` class that tracks computations and backpropagates gradients through the chain rule, a GPT architecture (embeddings, multi-head attention, MLP, residual connections, RMSNorm), and an Adam optimizer. Train it on a preset dataset or your own text, then run inference.
 
 ## Getting Started
 
