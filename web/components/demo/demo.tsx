@@ -343,7 +343,7 @@ export function TrainDemo() {
             />
           </TabsContent>
 
-          <TabsContent value="train" className="mt-0">
+          <TabsContent value="train" className="mt-0 flex min-h-0 flex-1 flex-col">
             <TrainTab
               status={status}
               step={step}

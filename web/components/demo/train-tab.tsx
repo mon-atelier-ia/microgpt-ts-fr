@@ -38,7 +38,7 @@ export function TrainTab({
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 flex-1 min-h-0">
       <TrainStatus
         step={step}
         numSteps={trainingConfig.numSteps}
@@ -48,9 +48,10 @@ export function TrainTab({
       />
 
       {lossHistory.length > 1 && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 flex-[3] min-h-0">
           <p className={SECTION_LABEL}>Loss</p>
           <LossChart
+            className="flex-1 min-h-0"
             data={lossHistory}
             numSteps={trainingConfig.numSteps}
             isTraining={isTraining}
@@ -58,7 +59,7 @@ export function TrainTab({
         </div>
       )}
 
-      <LiveGenStream entries={liveGenEntries} />
+      <LiveGenStream className="flex-[2] min-h-0" entries={liveGenEntries} />
     </div>
   );
 }
