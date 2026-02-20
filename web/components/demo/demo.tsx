@@ -50,7 +50,7 @@ export function TrainDemo() {
   const pathname = usePathname();
   const tab = (searchParams.get("tab") ?? "dataset") as TabId;
   const setTab = (newTab: TabId) => router.replace(`${pathname}?tab=${newTab}`);
-  const [selectedPresetId, setSelectedPresetId] = useState("baby-names");
+  const [selectedPresetId, setSelectedPresetId] = useState("baby-names-simple");
   const [customText, setCustomText] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [step, setStep] = useState(0);
