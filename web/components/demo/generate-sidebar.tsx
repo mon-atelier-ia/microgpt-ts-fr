@@ -148,9 +148,7 @@ export function GenerateSidebar({
 
       {/* Mobile: collapsible */}
       <details className="md:hidden">
-        <summary
-          className="flex cursor-pointer list-none items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground [&::-webkit-details-marker]:hidden"
-        >
+        <summary className="flex cursor-pointer list-none items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground [&::-webkit-details-marker]:hidden">
           Settings
           <svg
             viewBox="0 0 10 6"
