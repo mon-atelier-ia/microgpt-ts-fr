@@ -53,7 +53,7 @@ pnpm install
 pnpm dev
 ```
 
-Head to `localhost:3000/playground` to train a model and generate text in real time.
+Head to `localhost:3000/playground` to train a model and generate text in real time, or use the hosted version at [microgpt-ts.vercel.app](https://microgpt-ts.vercel.app/playground).
 
 Features:
 
@@ -61,6 +61,7 @@ Features:
 - **Custom data** — paste or upload your own text
 - **Configurable architecture** — adjust embedding size, attention heads, layers, and block size
 - **Live training** — real-time loss charts and sample generation as the model trains
+- **Token-level inference** — step through generation one token at a time with probability distributions
 - **Temperature control** — adjust sampling randomness during generation
 - **Prefix conditioning** — seed generation with a starting string
 
