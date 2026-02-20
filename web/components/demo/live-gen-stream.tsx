@@ -6,7 +6,13 @@ import { SECTION_LABEL } from "./types";
 
 export type LiveGenEntry = { step: number; words: string[] };
 
-export function LiveGenStream({ entries, className }: { entries: LiveGenEntry[]; className?: string }) {
+export function LiveGenStream({
+  entries,
+  className,
+}: {
+  entries: LiveGenEntry[];
+  className?: string;
+}) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on new entries
