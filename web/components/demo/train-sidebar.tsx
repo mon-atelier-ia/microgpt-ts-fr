@@ -240,7 +240,7 @@ export function TrainSidebar({
         </div>
       </details>
 
-      <div className="flex flex-col gap-2 pt-4 md:pt-0">
+      <div className="flex flex-col gap-2">
         {isTraining ? (
           <Button variant="outline" onClick={onStop} className="w-full">
             Stop
@@ -254,7 +254,7 @@ export function TrainSidebar({
           <Button
             variant="outline"
             onClick={onSwitchToGenerate}
-            className="w-full"
+            className="hidden md:flex w-full"
           >
             Generate &rarr;
           </Button>
