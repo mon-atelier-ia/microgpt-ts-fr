@@ -47,13 +47,15 @@ function DemoNavTabs() {
 }
 
 export function Navbar() {
+  const pathname = usePathname();
+
   return (
     <header>
       <nav className="relative flex items-center justify-between px-6 py-3">
         <Link href="/" className="text-lg font-bold tracking-tight">
           microgpt
         </Link>
-        <div className="pointer-events-none absolute inset-x-0 flex justify-center">
+        <div className="pointer-events-none absolute inset-x-0 hidden md:flex justify-center">
           <div className="pointer-events-auto">
             <Suspense>
               <DemoNavTabs />
@@ -92,6 +94,13 @@ export function Navbar() {
           </Link>
         </div>
       </nav>
+      {pathname === "/playground" && (
+        <div className="flex justify-center pb-2 md:hidden">
+          <Suspense>
+            <DemoNavTabs />
+          </Suspense>
+        </div>
+      )}
       <Separator />
     </header>
   );
