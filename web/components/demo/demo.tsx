@@ -3,25 +3,12 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Separator } from "@/components/ui/separator";
-import { type TrainHandle, trainAsync } from "../../../microgpt/browser";
+import type { TrainWorkerIn, TrainWorkerOut } from "../../../microgpt/browser";
 import {
-  buildTokenizer,
   DEFAULT_CONFIG,
-  getParams,
   type InferenceStep,
-  inference,
-  inferenceStepwise,
-  initStateDict,
   type ModelConfig,
-  type StateDict,
-  type Tokenizer,
 } from "../../../microgpt/model";
-import {
-  type AdamState,
-  DEFAULT_ADAM_CONFIG,
-  initAdamState,
-} from "../../../microgpt/train";
-import { parseDocs, splitDocs } from "../../../microgpt/utils";
 import { DatasetSidebar } from "./dataset-sidebar";
 import { DatasetTab } from "./dataset-tab";
 import { GenerateSidebar } from "./generate-sidebar";
@@ -35,12 +22,17 @@ import type { GenerateMode, Status } from "./types";
 
 // --- Constants ---
 
-const LIVE_GEN_INTERVAL = 100;
-const LIVE_GEN_SAMPLES = 5;
 const MAX_LIVE_GEN = 15;
 const DEFAULT_NUM_SAMPLES = 20;
 
 type TabId = "dataset" | "train" | "generate";
+
+type TokenizerInfo = {
+  chars: string[];
+  BOS: number;
+  vocabSize: number;
+  blockSize: number;
+};
 
 // --- Main Demo ---
 
@@ -69,10 +61,6 @@ export function TrainDemo() {
   const [temperature, setTemperature] = useState(0.5);
   const [numSamples, setNumSamples] = useState(DEFAULT_NUM_SAMPLES);
   const [prefix, setPrefix] = useState("");
-  const temperatureRef = useRef(temperature);
-  useEffect(() => {
-    temperatureRef.current = temperature;
-  }, [temperature]);
 
   const datasetText =
     selectedPresetId === CUSTOM_PRESET_ID
@@ -83,14 +71,11 @@ export function TrainDemo() {
     .split("\n")
     .filter((l) => l.trim().length > 0).length;
 
-  const handleRef = useRef<TrainHandle | null>(null);
-  const modelRef = useRef<{
-    stateDict: StateDict;
-    adamState: AdamState;
-    tokenizer: Tokenizer;
-    modelConfig: ModelConfig;
-  } | null>(null);
-
+  const trainWorkerRef = useRef<Worker | null>(null);
+  const evalWorkerRef = useRef<Worker | null>(null);
+  const tokenizerInfoRef = useRef<TokenizerInfo | null>(null);
+  const lossBufferRef = useRef<LossPoint[]>([]);
+  const evalStepMapRef = useRef<Record<number, number>>({});
   useEffect(() => {
     if (status !== "training") return;
     const start = Date.now();
@@ -100,9 +85,21 @@ export function TrainDemo() {
     return () => clearInterval(id);
   }, [status]);
 
-  const lossBufferRef = useRef<LossPoint[]>([]);
+  const terminateWorkers = useCallback(() => {
+    trainWorkerRef.current?.terminate();
+    trainWorkerRef.current = null;
+    evalWorkerRef.current?.terminate();
+    evalWorkerRef.current = null;
+  }, []);
 
-  const handleTrain = useCallback(async () => {
+  useEffect(() => terminateWorkers, [terminateWorkers]);
+
+  const sendTrain = useCallback((msg: TrainWorkerIn) => {
+    trainWorkerRef.current?.postMessage(msg);
+  }, []);
+
+  const handleTrain = useCallback(() => {
+    terminateWorkers();
     router.replace(`${pathname}?tab=train`);
     setStatus("training");
     setStep(0);
@@ -112,121 +109,156 @@ export function TrainDemo() {
     setLiveGenEntries([]);
     setOutput([]);
     setElapsed(0);
+    setExploreSteps([]);
+    setExploreDone(false);
+    setIsGenerating(false);
     lossBufferRef.current = [];
+    evalStepMapRef.current = {};
 
-    const allDocs = parseDocs(datasetText);
-    const { train: trainDocs, eval: evalDocsSplit } = splitDocs(allDocs);
-    const tokenizer = buildTokenizer(allDocs);
-    const stateDict = initStateDict(tokenizer.vocabSize, modelConfig);
-    const adamState = initAdamState(getParams(stateDict).length);
-
-    const adamConfig = {
-      ...DEFAULT_ADAM_CONFIG,
-      learningRate: trainingConfig.learningRate,
+    const evalWorker = new Worker(
+      new URL("../../workers/eval-worker.ts", import.meta.url),
+    );
+    evalWorkerRef.current = evalWorker;
+    evalWorker.onmessage = (
+      e: MessageEvent<{ id: number; avgLoss: number }>,
+    ) => {
+      const { id, avgLoss } = e.data;
+      const step = evalStepMapRef.current[id];
+      if (step === undefined) return;
+      delete evalStepMapRef.current[id];
+      setEvalLoss(avgLoss);
+      const target = lossBufferRef.current.find((p) => p.step === step);
+      if (target) target.evalLoss = avgLoss;
+      setLossHistory([...lossBufferRef.current]);
     };
 
-    modelRef.current = { stateDict, adamState, tokenizer, modelConfig };
+    const trainWorker = new Worker(
+      new URL("../../workers/train-worker.ts", import.meta.url),
+    );
+    trainWorkerRef.current = trainWorker;
+    trainWorker.onmessage = (e: MessageEvent<TrainWorkerOut>) => {
+      const msg = e.data;
+      switch (msg.type) {
+        case "ready":
+          tokenizerInfoRef.current = msg.tokenizer;
+          break;
 
-    const handle = trainAsync(
-      stateDict,
-      adamState,
-      trainDocs,
-      tokenizer,
-      trainingConfig.numSteps,
-      adamConfig,
-      modelConfig,
-      (info) => {
-        const s = info.step + 1;
-        setStep(s);
-        setLoss(info.smoothLoss);
-        lossBufferRef.current.push({
-          step: s,
-          loss: info.smoothLoss,
-        });
-        if (s % 10 === 0 || s === info.numSteps) {
+        case "steps":
+          for (const s of msg.batch) {
+            lossBufferRef.current.push({ step: s.step, loss: s.smoothLoss });
+          }
+          {
+            const last = msg.batch[msg.batch.length - 1];
+            setStep(last.step);
+            setLoss(last.smoothLoss);
+          }
           setLossHistory([...lossBufferRef.current]);
-        }
-        if (s % LIVE_GEN_INTERVAL === 0) {
-          const words = Array.from({ length: LIVE_GEN_SAMPLES }, () =>
-            inference(
-              stateDict,
-              tokenizer,
-              temperatureRef.current,
-              modelConfig,
-            ),
-          );
+          break;
+
+        case "live-gen":
           setLiveGenEntries((prev) => {
-            const next = [...prev, { step: s, words }];
+            const next = [...prev, { step: msg.step, words: msg.words }];
             return next.length > MAX_LIVE_GEN
               ? next.slice(next.length - MAX_LIVE_GEN)
               : next;
           });
-        }
-      },
-      {
-        docs: evalDocsSplit,
-        onEval: (evalInfo) => {
-          setEvalLoss(evalInfo.evalLoss);
-          const evalS = evalInfo.evalStep + 1;
-          const target = lossBufferRef.current.find((p) => p.step === evalS);
-          if (target) target.evalLoss = evalInfo.evalLoss;
-          setLossHistory([...lossBufferRef.current]);
-        },
-        createWorker: () =>
-          new Worker(new URL("../../workers/eval-worker.ts", import.meta.url)),
-      },
-    );
-    handleRef.current = handle;
+          break;
 
-    await handle.promise;
-    handleRef.current = null;
-    setLossHistory([...lossBufferRef.current]);
-    setStatus((prev) => (prev === "training" ? "trained" : prev));
-  }, [datasetText, modelConfig, trainingConfig, router, pathname]);
+        case "eval-snapshot":
+          evalStepMapRef.current[msg.id] = msg.step;
+          evalWorker.postMessage({
+            id: msg.id,
+            weights: msg.weights,
+            encodedDocs: msg.encodedEvalDocs,
+            config: msg.modelConfig,
+          });
+          break;
+
+        case "done":
+          setLossHistory([...lossBufferRef.current]);
+          setStatus((prev) => (prev === "training" ? "trained" : prev));
+          break;
+
+        case "gen-word":
+          setOutput((prev) => [...prev, msg.word]);
+          break;
+
+        case "gen-done":
+          setIsGenerating(false);
+          break;
+
+        case "explore-step":
+          setExploreSteps((prev) => [...prev, msg.step]);
+          if (
+            tokenizerInfoRef.current &&
+            msg.step.tokenId === tokenizerInfoRef.current.BOS
+          ) {
+            setExploreDone(true);
+          }
+          break;
+      }
+    };
+
+    sendTrain({
+      type: "init",
+      datasetText,
+      modelConfig,
+      numSteps: trainingConfig.numSteps,
+      learningRate: trainingConfig.learningRate,
+      temperature,
+    });
+  }, [
+    datasetText,
+    modelConfig,
+    trainingConfig,
+    temperature,
+    router,
+    pathname,
+    terminateWorkers,
+    sendTrain,
+  ]);
 
   const handleStop = useCallback(() => {
-    handleRef.current?.abort();
-    handleRef.current = null;
+    sendTrain({ type: "abort" });
+    evalWorkerRef.current?.terminate();
+    evalWorkerRef.current = null;
     setStatus("trained");
-  }, []);
+  }, [sendTrain]);
 
   const [generateMode, setGenerateMode] = useState<GenerateMode>("explore");
   const [exploreSteps, setExploreSteps] = useState<InferenceStep[]>([]);
   const [exploreDone, setExploreDone] = useState(false);
-  const generatorRef = useRef<Generator<InferenceStep> | null>(null);
 
   const encodePrefixTokens = useCallback((): number[] => {
-    if (!modelRef.current || prefix.length === 0) return [];
-    const { chars } = modelRef.current.tokenizer;
+    if (!tokenizerInfoRef.current || prefix.length === 0) return [];
+    const { chars } = tokenizerInfoRef.current;
     return [...prefix].map((ch) => chars.indexOf(ch)).filter((id) => id >= 0);
   }, [prefix]);
 
   const handleNextToken = useCallback(() => {
-    if (!modelRef.current) return;
-    const { stateDict, tokenizer, modelConfig: mc } = modelRef.current;
-    if (!generatorRef.current) {
-      generatorRef.current = inferenceStepwise(
-        stateDict,
-        tokenizer,
+    if (!trainWorkerRef.current) return;
+    if (exploreSteps.length === 0 && !exploreDone) {
+      sendTrain({
+        type: "explore-start",
         temperature,
-        mc,
-        encodePrefixTokens(),
-      );
+        prefixTokens: encodePrefixTokens(),
+      });
+    } else {
+      sendTrain({ type: "explore-next" });
     }
-    const result = generatorRef.current.next();
-    if (result.done) return;
-    setExploreSteps((prev) => [...prev, result.value]);
-    if (result.value.tokenId === tokenizer.BOS) {
-      setExploreDone(true);
-      generatorRef.current = null;
-    }
-  }, [temperature, encodePrefixTokens]);
+  }, [
+    temperature,
+    encodePrefixTokens,
+    exploreSteps.length,
+    exploreDone,
+    sendTrain,
+  ]);
 
   const handleResetExplore = useCallback(() => {
-    generatorRef.current = null;
+    sendTrain({ type: "explore-reset" });
     setExploreSteps([]);
     setExploreDone(false);
-  }, []);
+  }, [sendTrain]);
 
   const handlePrefixChange = useCallback(
     (newPrefix: string) => {
@@ -237,34 +269,18 @@ export function TrainDemo() {
   );
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const genAbortRef = useRef<AbortController | null>(null);
 
   const handleGenerate = useCallback(() => {
-    if (!modelRef.current) return;
-    genAbortRef.current?.abort();
-    const abort = new AbortController();
-    genAbortRef.current = abort;
-
-    const { stateDict, tokenizer, modelConfig: mc } = modelRef.current;
-    const pfx = encodePrefixTokens();
+    if (!trainWorkerRef.current) return;
     setOutput([]);
     setIsGenerating(true);
-
-    let i = 0;
-    const tick = () => {
-      if (abort.signal.aborted) return;
-      if (i >= numSamples) {
-        setIsGenerating(false);
-        genAbortRef.current = null;
-        return;
-      }
-      const word = inference(stateDict, tokenizer, temperature, mc, pfx);
-      setOutput((prev) => [...prev, word]);
-      i++;
-      setTimeout(tick, 80);
-    };
-    tick();
-  }, [temperature, numSamples, encodePrefixTokens]);
+    sendTrain({
+      type: "generate",
+      temperature,
+      prefixTokens: encodePrefixTokens(),
+      numSamples,
+    });
+  }, [temperature, numSamples, encodePrefixTokens, sendTrain]);
 
   const isTraining = status === "training";
   const isTrained = status === "trained";
@@ -310,10 +326,10 @@ export function TrainDemo() {
             exploreDone={exploreDone}
             prefix={prefix}
             maxPrefixLength={
-              (modelRef.current?.modelConfig.blockSize ??
+              (tokenizerInfoRef.current?.blockSize ??
                 DEFAULT_CONFIG.blockSize) - 1
             }
-            allowedChars={modelRef.current?.tokenizer.chars ?? []}
+            allowedChars={tokenizerInfoRef.current?.chars ?? []}
             onModeChange={setGenerateMode}
             onTemperatureChange={setTemperature}
             onNumSamplesChange={setNumSamples}
@@ -365,11 +381,11 @@ export function TrainDemo() {
                 exploreSteps={exploreSteps}
                 exploreDone={exploreDone}
                 vocabLabels={
-                  modelRef.current
-                    ? [...modelRef.current.tokenizer.chars, "·"]
+                  tokenizerInfoRef.current
+                    ? [...tokenizerInfoRef.current.chars, "·"]
                     : []
                 }
-                BOS={modelRef.current?.tokenizer.BOS ?? 0}
+                BOS={tokenizerInfoRef.current?.BOS ?? 0}
                 prefixChars={[...prefix]}
                 onSwitchToTrain={() => setTab("train")}
               />
