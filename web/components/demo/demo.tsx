@@ -8,7 +8,6 @@ import {
   type InferenceStep,
   type ModelConfig,
 } from "../../../microgpt/model";
-import { emaSmooth } from "../../../microgpt/utils";
 import type {
   TrainWorkerIn,
   TrainWorkerOut,
@@ -80,8 +79,6 @@ export function TrainDemo() {
   const tokenizerInfoRef = useRef<TokenizerInfo | null>(null);
   const lossBufferRef = useRef<LossPoint[]>([]);
   const evalStepMapRef = useRef<Record<number, number>>({});
-  const smoothEvalLossRef = useRef<number | undefined>(undefined);
-
   useEffect(() => {
     if (status !== "training") return;
     const start = Date.now();
@@ -115,9 +112,11 @@ export function TrainDemo() {
     setLiveGenEntries([]);
     setOutput([]);
     setElapsed(0);
+    setExploreSteps([]);
+    setExploreDone(false);
+    setIsGenerating(false);
     lossBufferRef.current = [];
     evalStepMapRef.current = {};
-    smoothEvalLossRef.current = undefined;
 
     const evalWorker = new Worker(
       new URL("../../workers/eval-worker.ts", import.meta.url),
@@ -130,7 +129,6 @@ export function TrainDemo() {
       const step = evalStepMapRef.current[id];
       if (step === undefined) return;
       delete evalStepMapRef.current[id];
-      smoothEvalLossRef.current = emaSmooth(smoothEvalLossRef.current, avgLoss);
       setEvalLoss(avgLoss);
       const target = lossBufferRef.current.find((p) => p.step === step);
       if (target) target.evalLoss = avgLoss;
