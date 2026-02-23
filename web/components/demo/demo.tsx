@@ -3,15 +3,12 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Separator } from "@/components/ui/separator";
+import type { TrainWorkerIn, TrainWorkerOut } from "../../../microgpt/browser";
 import {
   DEFAULT_CONFIG,
   type InferenceStep,
   type ModelConfig,
 } from "../../../microgpt/model";
-import type {
-  TrainWorkerIn,
-  TrainWorkerOut,
-} from "../../../microgpt/worker-types";
 import { DatasetSidebar } from "./dataset-sidebar";
 import { DatasetTab } from "./dataset-tab";
 import { GenerateSidebar } from "./generate-sidebar";

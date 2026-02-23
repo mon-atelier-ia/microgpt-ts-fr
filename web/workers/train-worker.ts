@@ -1,4 +1,8 @@
-import { snapshotWeights } from "../../microgpt/browser";
+import {
+  snapshotWeights,
+  type TrainWorkerIn,
+  type TrainWorkerOut,
+} from "../../microgpt/browser";
 import {
   buildTokenizer,
   getParams,
@@ -17,10 +21,6 @@ import {
   trainStep,
 } from "../../microgpt/train";
 import { emaSmooth, parseDocs, splitDocs } from "../../microgpt/utils";
-import type {
-  TrainWorkerIn,
-  TrainWorkerOut,
-} from "../../microgpt/worker-types";
 
 const CHUNK_SIZE = 10;
 const LIVE_GEN_INTERVAL = 100;
