@@ -4,9 +4,9 @@ Fork francais de [dubzdubz/microgpt-ts](https://github.com/dubzdubz/microgpt-ts)
 
 ## Ce que ce fork ajoute
 
-- Interface utilisateur traduite en francais
-- Datasets supplementaires : prenoms francais, dinosaures, pokemon FR
+- Datasets FR : prenoms (top 1000 INSEE), dinosaures, pokemon FR
 - Hooks git (Husky) : lint au commit, build + tests au push
+- Traduction UI en francais (a venir)
 
 **Playground en ligne : [microgpt-ts-fr.vercel.app](https://microgpt-ts-fr.vercel.app/)**
 
