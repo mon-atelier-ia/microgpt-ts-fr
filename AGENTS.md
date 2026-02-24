@@ -118,9 +118,9 @@ export const variableName: string[] = [
 ## Project: microgpt-ts-fr
 
 ### Context
-- Clone of dubzdubz/microgpt-ts, adapted for French UI and datasets
-- Solo developer (pierrealexandreguillemin-a11y)
-- Target deployment: microgpt-ts-fr.vercel.app
+- Fork of dubzdubz/microgpt-ts, adapted for French UI and datasets
+- Org: mon-atelier-ia
+- Live: https://microgpt-ts-fr.vercel.app (auto-deploy on push via Vercel GitHub integration)
 
 ### Git Rules — STRICT
 - NEVER run `git push` without explicit user request

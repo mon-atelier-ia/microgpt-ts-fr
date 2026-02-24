@@ -11,7 +11,8 @@
       "!web/storybook-static",
       "!web/components/ui",
       "!web/components/aceternity",
-      "!web/lib/utils.ts"
+      "!web/lib/utils.ts",
+      "!.vercel"
     ]
   },
   "formatter": {

@@ -4,9 +4,11 @@ Fork francais de [dubzdubz/microgpt-ts](https://github.com/dubzdubz/microgpt-ts)
 
 ## Ce que ce fork ajoute
 
-- Datasets FR : prenoms (top 1000 INSEE), dinosaures, pokemon FR
-- Hooks git (Husky) : lint au commit, build + tests au push
-- Traduction UI en francais (a venir)
+- **UI entierement en francais** : tous les textes de l'interface traduits
+- **Datasets FR** : prenoms-simple (50), prenoms (1k), pokemon-fr (1022), dinosaures (1522)
+- **Presets FR uniquement** : les presets anglais sont retires de l'UI (datasets conserves)
+- **Hooks git** (Husky) : lint au commit, build + tests au push
+- **Auto-deploy** : chaque push sur `main` declenche un build Vercel
 
 **Playground en ligne : [microgpt-ts-fr.vercel.app](https://microgpt-ts-fr.vercel.app/)**
 
@@ -15,7 +17,7 @@ Fork francais de [dubzdubz/microgpt-ts](https://github.com/dubzdubz/microgpt-ts)
 **Prerequis :** [Node.js](https://nodejs.org/) (v24+) et [pnpm](https://pnpm.io/)
 
 ```bash
-git clone https://github.com/pierrealexandreguillemin-a11y/microgpt-ts-fr.git
+git clone https://github.com/mon-atelier-ia/microgpt-ts-fr.git
 cd microgpt-ts-fr
 pnpm install
 cd web && pnpm install
