@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { strings } from "@/lib/strings";
 import type { InferenceStep } from "../../../microgpt/model";
 import { TokenProbChart } from "./token-prob-chart";
 import { SECTION_LABEL } from "./types";
@@ -37,7 +38,7 @@ export function ExploreView({
           </div>
         )}
         <p className="text-sm text-muted-foreground">
-          Click Next Token to begin
+          {strings.explore.clickToBegin}
         </p>
       </div>
     );
@@ -52,7 +53,7 @@ export function ExploreView({
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
-        <p className={SECTION_LABEL}>Sample output</p>
+        <p className={SECTION_LABEL}>{strings.explore.sampleOutput}</p>
         <div className="flex flex-wrap gap-2">
           {prefixChars.map((char, i) => (
             <div
@@ -97,8 +98,10 @@ export function ExploreView({
 
       <div className="flex flex-col gap-2">
         <p className={SECTION_LABEL}>
-          Token probabilities{" "}
-          <span className="font-normal">— position {totalChars}</span>
+          {strings.explore.tokenProbs}{" "}
+          <span className="font-normal">
+            — {strings.explore.position} {totalChars}
+          </span>
         </p>
         <TokenProbChart
           probs={lastStep.probs}
@@ -106,8 +109,7 @@ export function ExploreView({
           vocabLabels={vocabLabels}
         />
         <p className="text-xs text-muted-foreground">
-          Each bar shows the probability the model assigns to each character.
-          The highlighted bar was sampled.
+          {strings.explore.probsDesc}
         </p>
       </div>
     </div>

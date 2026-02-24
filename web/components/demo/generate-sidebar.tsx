@@ -9,6 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { strings } from "@/lib/strings";
 import { type GenerateMode, sliderVal } from "./types";
 
 type GenerateSidebarProps = {
@@ -64,9 +65,9 @@ export function GenerateSidebar({
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
           <Label htmlFor="prefix" className="text-xs">
-            Prefix
+            {strings.generate.prefix}
           </Label>
-          <HintIcon text="Starting characters for generation" />
+          <HintIcon text={strings.generate.prefixHint} />
         </div>
         <Input
           id="prefix"
@@ -85,8 +86,8 @@ export function GenerateSidebar({
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
-            <Label className="text-xs">Temperature</Label>
-            <HintIcon text="Higher = more random, lower = more confident" />
+            <Label className="text-xs">{strings.generate.temperature}</Label>
+            <HintIcon text={strings.generate.temperatureHint} />
           </div>
           <span className="font-mono text-xs text-muted-foreground">
             {temperature.toFixed(1)}
@@ -107,7 +108,7 @@ export function GenerateSidebar({
           <Label
             className={`text-xs ${isStepByStep ? "text-muted-foreground" : ""}`}
           >
-            Samples
+            {strings.generate.samples}
           </Label>
           <span
             className={`font-mono text-xs ${isStepByStep ? "text-muted-foreground/50" : "text-muted-foreground"}`}
@@ -132,7 +133,7 @@ export function GenerateSidebar({
     <div className="flex w-full md:w-48 shrink-0 flex-col gap-5">
       <div className="flex items-center justify-between">
         <Label htmlFor="step-by-step" className="text-sm cursor-pointer">
-          Step-by-step
+          {strings.generate.stepByStep}
         </Label>
         <Switch
           id="step-by-step"
@@ -149,7 +150,7 @@ export function GenerateSidebar({
       {/* Mobile: collapsible */}
       <details className="md:hidden">
         <summary className="flex cursor-pointer list-none items-center gap-1.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground [&::-webkit-details-marker]:hidden">
-          Settings
+          {strings.generate.settings}
           <svg
             viewBox="0 0 10 6"
             className="h-2.5 w-2.5 transition-transform [[open]>&]:rotate-180"
@@ -171,14 +172,14 @@ export function GenerateSidebar({
               disabled={exploreDone}
               className="w-full"
             >
-              Next Token
+              {strings.generate.nextToken}
             </Button>
             <Button
               variant="outline"
               onClick={onResetExplore}
               className="w-full"
             >
-              Reset
+              {strings.generate.reset}
             </Button>
           </>
         ) : (
@@ -187,7 +188,9 @@ export function GenerateSidebar({
             disabled={isGenerating}
             className="w-full"
           >
-            {isGenerating ? "Generating\u2026" : "Generate"}
+            {isGenerating
+              ? strings.generate.generating
+              : strings.generate.generateBtn}
           </Button>
         )}
       </div>

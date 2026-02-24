@@ -1,3 +1,5 @@
+import { strings } from "@/lib/strings";
+
 type TrainStatusProps = {
   step: number;
   numSteps: number;
@@ -36,7 +38,7 @@ export function TrainStatus({
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 rounded-lg border bg-muted/30 px-5 py-3.5">
       {/* Mobile row 1 left / Desktop col 1 */}
-      <Stat label="Step">
+      <Stat label={strings.train.step}>
         <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
           {step.toLocaleString()}
           <span className="text-sm font-normal text-muted-foreground">
@@ -48,7 +50,7 @@ export function TrainStatus({
 
       {/* Mobile row 1 right / Desktop col 4 */}
       <div className="md:order-4">
-        <Stat label="Time">
+        <Stat label={strings.train.time}>
           <span className="font-mono text-lg font-semibold tabular-nums leading-tight">
             {(elapsed / 1000).toFixed(1)}s
           </span>
@@ -58,7 +60,7 @@ export function TrainStatus({
       {/* Mobile row 2 left / Desktop col 2 */}
       <div className="md:order-2">
         <Stat
-          label="Train loss"
+          label={strings.train.trainLoss}
           indicator={
             <span className="inline-block h-2 w-2 rounded-full bg-chart-1" />
           }
@@ -72,7 +74,7 @@ export function TrainStatus({
       {/* Mobile row 2 right / Desktop col 3 */}
       <div className="md:order-3">
         <Stat
-          label="Eval loss"
+          label={strings.train.evalLoss}
           indicator={
             <span className="inline-block h-2 w-2 rounded-full bg-chart-2" />
           }

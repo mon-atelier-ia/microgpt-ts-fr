@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { strings } from "@/lib/strings";
 
 type TokenProbChartProps = {
   probs: number[];
@@ -68,7 +69,7 @@ export function TokenProbChart({
           })}
         </div>
         <p className="text-[9px] text-muted-foreground text-center mt-0.5">
-          Character
+          {strings.chart.character}
         </p>
       </div>
     </div>

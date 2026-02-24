@@ -1,3 +1,4 @@
+import { strings } from "@/lib/strings";
 import type { LiveGenEntry } from "./live-gen-stream";
 import { LiveGenStream } from "./live-gen-stream";
 import type { LossPoint } from "./loss-chart";
@@ -30,9 +31,7 @@ export function TrainTab({
   if (status === "idle") {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
-        <p className="text-muted-foreground">
-          Configure hyperparameters, then start training.
-        </p>
+        <p className="text-muted-foreground">{strings.train.idle}</p>
       </div>
     );
   }
@@ -48,7 +47,7 @@ export function TrainTab({
       />
 
       <div className="flex flex-col gap-2 flex-[3] min-h-0">
-        <p className={SECTION_LABEL}>Loss</p>
+        <p className={SECTION_LABEL}>{strings.train.loss}</p>
         {lossHistory.length > 1 ? (
           <LossChart
             className="flex-1 min-h-0"

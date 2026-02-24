@@ -7,13 +7,14 @@ import { Suspense } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
 type TabId = "dataset" | "train" | "generate";
 const DEMO_TABS: { id: TabId; label: string }[] = [
-  { id: "dataset", label: "Dataset" },
-  { id: "train", label: "Train" },
-  { id: "generate", label: "Generate" },
+  { id: "dataset", label: strings.tabs.dataset },
+  { id: "train", label: strings.tabs.train },
+  { id: "generate", label: strings.tabs.generate },
 ];
 
 function DemoNavTabs() {
@@ -53,7 +54,7 @@ export function Navbar() {
     <header>
       <nav className="relative flex items-center justify-between px-6 py-3">
         <Link href="/" className="text-lg font-bold tracking-tight">
-          microgpt
+          {strings.nav.logo}
         </Link>
         <div className="pointer-events-none absolute inset-x-0 hidden md:flex justify-center">
           <div className="pointer-events-auto">
@@ -67,7 +68,7 @@ export function Navbar() {
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label="GitHub"
+            aria-label={strings.nav.github}
             nativeButton={false}
             render={
               // biome-ignore lint/a11y/useAnchorContent: children injected by Base UI render prop
@@ -84,13 +85,13 @@ export function Navbar() {
             href="/playground"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            Playground
+            {strings.nav.playground}
           </Link>
           <Link
             href="/about"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            About
+            {strings.nav.about}
           </Link>
         </div>
       </nav>

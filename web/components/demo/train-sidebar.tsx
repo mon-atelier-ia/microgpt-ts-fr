@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Slider } from "@/components/ui/slider";
+import { strings } from "@/lib/strings";
 import type { ModelConfig } from "../../../microgpt/model";
 import { SECTION_LABEL, sliderVal } from "./types";
 
@@ -102,10 +103,10 @@ function ConfigFields({
   return (
     <>
       <div className="flex flex-col gap-3">
-        <p className={SECTION_LABEL}>Model</p>
+        <p className={SECTION_LABEL}>{strings.train.model}</p>
         <SelectField
           id="nEmbd"
-          label="Embedding dim"
+          label={strings.train.embeddingDim}
           value={modelConfig.nEmbd}
           options={[8, 16, 32]}
           disabled={disabled}
@@ -113,7 +114,7 @@ function ConfigFields({
         />
         <SelectField
           id="nHead"
-          label="Attention heads"
+          label={strings.train.attentionHeads}
           value={modelConfig.nHead}
           options={[1, 2, 4]}
           disabled={disabled}
@@ -121,7 +122,7 @@ function ConfigFields({
         />
         <SelectField
           id="nLayer"
-          label="Layers"
+          label={strings.train.layers}
           value={modelConfig.nLayer}
           options={[1, 2, 4]}
           disabled={disabled}
@@ -129,7 +130,7 @@ function ConfigFields({
         />
         <SelectField
           id="blockSize"
-          label="Context length"
+          label={strings.train.contextLength}
           value={modelConfig.blockSize}
           options={[8, 16, 32, 64]}
           disabled={disabled}
@@ -140,11 +141,11 @@ function ConfigFields({
       <Separator />
 
       <div className="flex flex-col gap-3">
-        <p className={SECTION_LABEL}>Training</p>
+        <p className={SECTION_LABEL}>{strings.train.training}</p>
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <Label className="text-xs">Learning rate</Label>
+            <Label className="text-xs">{strings.train.learningRate}</Label>
             <span className="font-mono text-xs text-muted-foreground">
               {trainingConfig.learningRate.toPrecision(2)}
             </span>
@@ -167,7 +168,7 @@ function ConfigFields({
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
-            <Label className="text-xs">Training steps</Label>
+            <Label className="text-xs">{strings.train.trainingSteps}</Label>
             <span className="font-mono text-xs text-muted-foreground">
               {trainingConfig.numSteps}
             </span>
@@ -224,7 +225,7 @@ export function TrainSidebar({
         <summary
           className={`flex cursor-pointer list-none items-center gap-1.5 ${SECTION_LABEL} [&::-webkit-details-marker]:hidden`}
         >
-          Settings
+          {strings.train.settings}
           <svg
             viewBox="0 0 10 6"
             className="h-2.5 w-2.5 transition-transform [[open]>&]:rotate-180"
@@ -243,11 +244,11 @@ export function TrainSidebar({
       <div className="flex flex-col gap-2">
         {isTraining ? (
           <Button variant="outline" onClick={onStop} className="w-full">
-            Stop
+            {strings.train.stop}
           </Button>
         ) : (
           <Button onClick={onTrain} className="w-full">
-            {isTrained ? "Re-train" : "Train"}
+            {isTrained ? strings.train.retrain : strings.train.trainBtn}
           </Button>
         )}
         {isTrained && (
@@ -256,7 +257,7 @@ export function TrainSidebar({
             onClick={onSwitchToGenerate}
             className="hidden md:flex w-full"
           >
-            Generate &rarr;
+            {strings.train.goGenerate}
           </Button>
         )}
       </div>

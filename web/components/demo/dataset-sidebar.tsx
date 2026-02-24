@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 import { CUSTOM_PRESET, CUSTOM_PRESET_ID, PRESETS } from "./presets";
 import { SECTION_LABEL } from "./types";
@@ -25,7 +26,7 @@ export function DatasetSidebar({
   const all = [CUSTOM_PRESET, ...PRESETS];
   return (
     <div className="flex w-full md:w-48 shrink-0 flex-col gap-1">
-      <p className={`mb-2 ${SECTION_LABEL}`}>Dataset</p>
+      <p className={`mb-2 ${SECTION_LABEL}`}>{strings.dataset.label}</p>
       {all.map((preset) => {
         const Icon = preset.icon;
         const active = selectedId === preset.id;
@@ -68,7 +69,7 @@ export function DatasetSidebar({
           disabled={disabled || wordCount === 0}
           className="w-full"
         >
-          Train on this dataset
+          {strings.dataset.trainButton}
         </Button>
       </div>
     </div>

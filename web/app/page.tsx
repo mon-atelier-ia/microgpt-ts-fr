@@ -2,6 +2,7 @@ import Link from "next/link";
 import { DottedGlowBackground } from "@/components/aceternity/dotted-glow-background";
 import { HeroCta } from "@/components/hero-cta";
 import { Separator } from "@/components/ui/separator";
+import { strings } from "@/lib/strings";
 
 export default function HomePage() {
   return (
@@ -25,25 +26,19 @@ export default function HomePage() {
 
       <div className="relative z-10 flex max-w-xl flex-col items-center gap-8 text-center">
         <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-5xl">
-          microgpt-ts
+          {strings.home.heading}
         </h1>
 
-        <p className="text-lg text-muted-foreground">
-          A complete GPT built from scratch in TypeScript. Zero dependencies.
-          Runs directly in your browser.
-        </p>
+        <p className="text-lg text-muted-foreground">{strings.home.sub}</p>
 
         <Separator className="w-24" />
 
         <p className="text-sm leading-relaxed text-muted-foreground">
-          GPT-2-like architecture with tokenizer, autograd, multi-head
-          attention, and Adam optimizer. Training &amp; inference in ~400 lines
-          of readable code. Train a model and generate text right here in your
-          browser.
+          {strings.home.desc}
         </p>
 
         <p className="text-xs text-muted-foreground/60">
-          Inspired by Andrej Karpathy&apos;s{" "}
+          {strings.home.inspired}{" "}
           <Link
             href="https://karpathy.github.io/2026/02/12/microgpt/"
             target="_blank"
@@ -52,6 +47,7 @@ export default function HomePage() {
           >
             microgpt
           </Link>
+          {strings.home.inspiredEnd}
         </p>
 
         <HeroCta />

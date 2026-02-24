@@ -3,6 +3,7 @@
 import { ArrowRight, Github } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { strings } from "@/lib/strings";
 
 export function HeroCta() {
   return (
@@ -12,7 +13,7 @@ export function HeroCta() {
         nativeButton={false}
         render={<Link href="/playground" />}
       >
-        Open Playground
+        {strings.nav.openPlayground}
         <ArrowRight className="ml-2 size-4" />
       </Button>
 
@@ -30,7 +31,7 @@ export function HeroCta() {
         }
       >
         <Github className="size-4" />
-        GitHub
+        {strings.nav.github}
       </Button>
     </div>
   );

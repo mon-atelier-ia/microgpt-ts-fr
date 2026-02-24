@@ -4,14 +4,14 @@ import { Inter } from "next/font/google";
 import { Navbar } from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { strings } from "@/lib/strings";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "microgpt",
-  description:
-    "A complete GPT built from scratch with zero runtime dependencies.",
+  title: strings.meta.title,
+  description: strings.meta.description,
 };
 
 export default function RootLayout({

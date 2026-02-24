@@ -1,0 +1,161 @@
+export const strings = {
+  meta: {
+    title: "microgpt",
+    description:
+      "A complete GPT built from scratch with zero runtime dependencies.",
+  },
+  nav: {
+    logo: "microgpt",
+    playground: "Playground",
+    about: "About",
+    github: "GitHub",
+    openPlayground: "Open Playground",
+    toggleTheme: "Toggle theme",
+  },
+  tabs: {
+    dataset: "Dataset",
+    train: "Train",
+    generate: "Generate",
+  },
+  home: {
+    heading: "microgpt-ts",
+    sub: "A complete GPT built from scratch in TypeScript. Zero dependencies. Runs directly in your browser.",
+    desc: "GPT-2-like architecture with tokenizer, autograd, multi-head attention, and Adam optimizer. Training & inference in ~400 lines of readable code. Train a model and generate text right here in your browser.",
+    inspired: "Inspired by Andrej Karpathy\u2019s",
+    inspiredEnd: "",
+  },
+  about: {
+    title: "About",
+    intro1a:
+      " is a complete GPT built from scratch in TypeScript with zero runtime dependencies, inspired by Andrej Karpathy\u2019s ",
+    intro1b:
+      ". It implements a GPT-2-like architecture with a tokenizer, autograd engine, multi-head attention, and Adam optimizer. It includes training and inference loops in ~400 lines of readable code.",
+    intro2a: "This is an educational project. The full source code is on ",
+    intro2b:
+      ", each implementation step is a separate pull request you can read through, and the ",
+    intro2c: " lets you train and run the model directly in your browser.",
+    whatsInside: "What\u2019s inside",
+    insideLibThe: "The ",
+    insideLib: " library: a ",
+    insideLibDesc:
+      " autograd engine, GPT-2 architecture (embeddings, multi-head attention, MLP, residual connections, rmsnorm), and Adam optimizer",
+    insidePlaygroundA: "A ",
+    insidePlayground: "browser playground",
+    insidePlaygroundDesc:
+      " where you can train the model and generate text with no install and no backend",
+    learnTitle: "Learn step by step",
+    learnIntro:
+      "Following Karpathy\u2019s blog post, the model is built up one concept at a time. Each step introduces a new idea and is its own pull request, so you can follow the progression from a lookup table to a full GPT:",
+    step1: "Bigram count table",
+    step1desc: " \u2014 no neural net, no gradients",
+    step2: "MLP + manual gradients + SGD",
+    step3: "Autograd",
+    step3desc: " \u2014 a ",
+    step3descEnd: " class that replaces manual gradients",
+    step4: "Single-head attention",
+    step4desc: " \u2014 position embeddings, rmsnorm, residual connections",
+    step5: "Multi-head attention + layer loop",
+    step5desc: " \u2014 full GPT architecture",
+    step6: "Adam optimizer",
+    diffTitle: "Differences from the original",
+    diff1a:
+      "Karpathy\u2019s original microgpt is a single Python script optimized for brevity. ",
+    diff1b:
+      " takes a slightly different approach, prioritizing readability. The code is split into files and everything is typed. Math operations are broken out with helper functions like ",
+    diff1bAnd: ", and ",
+    diff2:
+      "The result is a reusable library packaged as a module, not a standalone script. The playground imports it directly. And because it\u2019s TypeScript, it runs natively in the browser with no Python runtime or backend required.",
+    creditsTitle: "Credits",
+    creditsInspired: "Inspired by Andrej Karpathy\u2019s",
+    creditsInspiredEnd: "",
+    creditsBuilt: "Built by",
+    creditsSource: ". Source on",
+  },
+  presets: {
+    babyNames: {
+      title: "Baby Names",
+      description: "50 popular names with soft vowels",
+    },
+    babyNames1k: {
+      title: "Baby Names (1k)",
+      description: "1000 diverse names from around the world",
+    },
+    pokemon: {
+      title: "Pok\u00e9mon",
+      description: "Punchy sounds and iconic suffixes",
+    },
+    cocktails: {
+      title: "Cocktails",
+      description: "Classic cocktail and spirit names",
+    },
+    movieTitles: {
+      title: "Movie Titles",
+      description: "Real film titles with cinematic rhythm",
+    },
+    custom: {
+      title: "Custom",
+      description: "Paste your own word list",
+    },
+  },
+  dataset: {
+    label: "Dataset",
+    trainButton: "Train on this dataset",
+    placeholder: "Enter words, one per line...",
+  },
+  train: {
+    model: "Model",
+    embeddingDim: "Embedding dim",
+    attentionHeads: "Attention heads",
+    layers: "Layers",
+    contextLength: "Context length",
+    training: "Training",
+    learningRate: "Learning rate",
+    trainingSteps: "Training steps",
+    settings: "Settings",
+    stop: "Stop",
+    retrain: "Re-train",
+    trainBtn: "Train",
+    goGenerate: "Generate \u2192",
+    idle: "Configure hyperparameters, then start training.",
+    loss: "Loss",
+    step: "Step",
+    time: "Time",
+    trainLoss: "Train loss",
+    evalLoss: "Eval loss",
+  },
+  generate: {
+    prefix: "Prefix",
+    prefixHint: "Starting characters for generation",
+    temperature: "Temperature",
+    temperatureHint: "Higher = more random, lower = more confident",
+    samples: "Samples",
+    stepByStep: "Step-by-step",
+    settings: "Settings",
+    nextToken: "Next Token",
+    reset: "Reset",
+    generating: "Generating\u2026",
+    generateBtn: "Generate",
+    notTrained: "Train the model first to generate new words.",
+    goToTrain: "Go to Train",
+    noOutput: "Click Generate to create new words",
+  },
+  explore: {
+    clickToBegin: "Click Next Token to begin",
+    sampleOutput: "Sample output",
+    tokenProbs: "Token probabilities",
+    position: "position",
+    probsDesc:
+      "Each bar shows the probability the model assigns to each character. The highlighted bar was sampled.",
+  },
+  liveStream: {
+    title: "Live samples",
+    waiting: "Waiting for samples\u2026",
+    step: "Step",
+  },
+  chart: {
+    train: "Train",
+    eval: "Eval",
+    step: "Step",
+    character: "Character",
+  },
+} as const;

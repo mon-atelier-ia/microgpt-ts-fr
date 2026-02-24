@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import { Baby, Clapperboard, Martini, PenLine, Zap } from "lucide-react";
+import { strings } from "@/lib/strings";
 
 import { babyNames } from "../../../datasets/baby-names";
 import { babyNamesSimple } from "../../../datasets/baby-names-simple";
@@ -22,36 +23,36 @@ const lines = (arr: string[]) => arr.join("\n");
 export const PRESETS: Preset[] = [
   {
     id: "baby-names-simple",
-    title: "Baby Names",
-    description: "50 popular names with soft vowels",
+    title: strings.presets.babyNames.title,
+    description: strings.presets.babyNames.description,
     icon: Baby,
     words: lines(babyNamesSimple),
   },
   {
     id: "baby-names",
-    title: "Baby Names (1k)",
-    description: "1000 diverse names from around the world",
+    title: strings.presets.babyNames1k.title,
+    description: strings.presets.babyNames1k.description,
     icon: Baby,
     words: lines(babyNames),
   },
   {
     id: "pokemon",
-    title: "Pokémon",
-    description: "Punchy sounds and iconic suffixes",
+    title: strings.presets.pokemon.title,
+    description: strings.presets.pokemon.description,
     icon: Zap,
     words: lines(pokemon),
   },
   {
     id: "cocktails",
-    title: "Cocktails",
-    description: "Punchy sounds and iconic suffixes",
+    title: strings.presets.cocktails.title,
+    description: strings.presets.cocktails.description,
     icon: Martini,
     words: lines(cocktails),
   },
   {
     id: "movie-titles",
-    title: "Movie Titles",
-    description: "Real film titles with cinematic rhythm",
+    title: strings.presets.movieTitles.title,
+    description: strings.presets.movieTitles.description,
     icon: Clapperboard,
     words: lines(movieTitles),
   },
@@ -66,8 +67,8 @@ export const PRESETS: Preset[] = [
 
 export const CUSTOM_PRESET: Preset = {
   id: CUSTOM_PRESET_ID,
-  title: "Custom",
-  description: "Paste your own word list",
+  title: strings.presets.custom.title,
+  description: strings.presets.custom.description,
   icon: PenLine,
   words: "",
 };

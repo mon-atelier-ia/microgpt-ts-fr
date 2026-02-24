@@ -7,14 +7,15 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
 export type LossPoint = { step: number; loss: number; evalLoss?: number };
 
-const lossChartConfig = {
-  loss: { label: "Train", color: "var(--chart-1)" },
-  evalLoss: { label: "Eval", color: "var(--chart-2)" },
-} satisfies ChartConfig;
+const lossChartConfig: ChartConfig = {
+  loss: { label: strings.chart.train, color: "var(--chart-1)" },
+  evalLoss: { label: strings.chart.eval, color: "var(--chart-2)" },
+};
 
 export function LossChart({
   data,
@@ -75,7 +76,7 @@ export function LossChart({
                   <ChartTooltipContent
                     labelFormatter={(_, payload) => {
                       const p = payload?.[0]?.payload as LossPoint | undefined;
-                      return p ? `Step ${p.step}` : "";
+                      return p ? `${strings.chart.step} ${p.step}` : "";
                     }}
                   />
                 }
@@ -138,7 +139,7 @@ export function LossChart({
               strokeWidth="2"
             />
           </svg>
-          Train
+          {strings.chart.train}
         </span>
         {hasEval && (
           <span className="flex items-center gap-1.5">
@@ -146,7 +147,7 @@ export function LossChart({
               <circle cx="4" cy="4" r="2.5" fill="var(--chart-2)" />
               <circle cx="16" cy="4" r="2.5" fill="var(--chart-2)" />
             </svg>
-            Eval
+            {strings.chart.eval}
           </span>
         )}
       </div>

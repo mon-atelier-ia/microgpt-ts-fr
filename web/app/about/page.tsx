@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { strings } from "@/lib/strings";
 
 export default function AboutPage() {
   return (
     <main className="flex flex-1 flex-col items-center overflow-y-auto px-6 py-12">
       <article className="flex max-w-xl flex-col gap-8">
         <div className="flex flex-col gap-4">
-          <h1 className="text-3xl font-bold tracking-tight">About</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {strings.about.title}
+          </h1>
 
           <p className="leading-relaxed text-muted-foreground">
-            <code className="text-foreground/80">microgpt-ts</code> is a
-            complete GPT built from scratch in TypeScript with zero runtime
-            dependencies, inspired by Andrej Karpathy&apos;s{" "}
+            <code className="text-foreground/80">microgpt-ts</code>
+            {strings.about.intro1a}
             <Link
               href="https://karpathy.github.io/2026/02/12/microgpt/"
               target="_blank"
@@ -20,13 +22,11 @@ export default function AboutPage() {
             >
               microgpt
             </Link>
-            . It implements a GPT-2-like architecture with a tokenizer, autograd
-            engine, multi-head attention, and Adam optimizer. It includes
-            training and inference loops in ~400 lines of readable code.
+            {strings.about.intro1b}
           </p>
 
           <p className="leading-relaxed text-muted-foreground">
-            This is an educational project. The full source code is on{" "}
+            {strings.about.intro2a}
             <Link
               href="https://github.com/dubzdubz/microgpt-ts"
               target="_blank"
@@ -35,35 +35,36 @@ export default function AboutPage() {
             >
               GitHub
             </Link>
-            , each implementation step is a separate pull request you can read
-            through, and the{" "}
+            {strings.about.intro2b}
             <Link
               href="/playground"
               className="underline underline-offset-4 hover:text-foreground"
             >
               playground
-            </Link>{" "}
-            lets you train and run the model directly in your browser.
+            </Link>
+            {strings.about.intro2c}
           </p>
         </div>
 
         <Separator />
 
         <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold">What&apos;s inside</h2>
+          <h2 className="text-xl font-semibold">{strings.about.whatsInside}</h2>
 
           <ul className="list-inside list-disc space-y-2 leading-relaxed text-muted-foreground">
             <li>
-              The <strong className="text-foreground/80">microgpt-ts</strong>{" "}
-              library: a <code className="text-foreground/80">Value</code>{" "}
-              autograd engine, GPT-2 architecture (embeddings, multi-head
-              attention, MLP, residual connections, rmsnorm), and Adam optimizer
+              {strings.about.insideLibThe}
+              <strong className="text-foreground/80">microgpt-ts</strong>
+              {strings.about.insideLib}
+              <code className="text-foreground/80">Value</code>
+              {strings.about.insideLibDesc}
             </li>
             <li>
-              A{" "}
-              <strong className="text-foreground/80">browser playground</strong>{" "}
-              where you can train the model and generate text with no install
-              and no backend
+              {strings.about.insidePlaygroundA}
+              <strong className="text-foreground/80">
+                {strings.about.insidePlayground}
+              </strong>
+              {strings.about.insidePlaygroundDesc}
             </li>
           </ul>
         </div>
@@ -71,13 +72,10 @@ export default function AboutPage() {
         <Separator />
 
         <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold">Learn step by step</h2>
+          <h2 className="text-xl font-semibold">{strings.about.learnTitle}</h2>
 
           <p className="leading-relaxed text-muted-foreground">
-            Following Karpathy&apos;s blog post, the model is built up one
-            concept at a time. Each step introduces a new idea and is its own
-            pull request, so you can follow the progression from a lookup table
-            to a full GPT:
+            {strings.about.learnIntro}
           </p>
 
           <ol className="list-inside list-decimal space-y-1 text-sm text-muted-foreground">
@@ -88,9 +86,9 @@ export default function AboutPage() {
                 rel="noopener noreferrer"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                Bigram count table
-              </Link>{" "}
-              — no neural net, no gradients
+                {strings.about.step1}
+              </Link>
+              {strings.about.step1desc}
             </li>
             <li>
               <Link
@@ -99,7 +97,7 @@ export default function AboutPage() {
                 rel="noopener noreferrer"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                MLP + manual gradients + SGD
+                {strings.about.step2}
               </Link>
             </li>
             <li>
@@ -109,10 +107,11 @@ export default function AboutPage() {
                 rel="noopener noreferrer"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                Autograd
-              </Link>{" "}
-              — a <code className="text-foreground/80">Value</code> class that
-              replaces manual gradients
+                {strings.about.step3}
+              </Link>
+              {strings.about.step3desc}
+              <code className="text-foreground/80">Value</code>
+              {strings.about.step3descEnd}
             </li>
             <li>
               <Link
@@ -121,9 +120,9 @@ export default function AboutPage() {
                 rel="noopener noreferrer"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                Single-head attention
-              </Link>{" "}
-              — position embeddings, rmsnorm, residual connections
+                {strings.about.step4}
+              </Link>
+              {strings.about.step4desc}
             </li>
             <li>
               <Link
@@ -132,9 +131,9 @@ export default function AboutPage() {
                 rel="noopener noreferrer"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                Multi-head attention + layer loop
-              </Link>{" "}
-              — full GPT architecture
+                {strings.about.step5}
+              </Link>
+              {strings.about.step5desc}
             </li>
             <li>
               <Link
@@ -143,7 +142,7 @@ export default function AboutPage() {
                 rel="noopener noreferrer"
                 className="underline underline-offset-4 hover:text-foreground"
               >
-                Adam optimizer
+                {strings.about.step6}
               </Link>
             </li>
           </ol>
@@ -152,37 +151,32 @@ export default function AboutPage() {
         <Separator />
 
         <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-semibold">
-            Differences from the original
-          </h2>
+          <h2 className="text-xl font-semibold">{strings.about.diffTitle}</h2>
 
           <p className="leading-relaxed text-muted-foreground">
-            Karpathy&apos;s original microgpt is a single Python script
-            optimized for brevity.{" "}
-            <code className="text-foreground/80">microgpt-ts</code> takes a
-            slightly different approach, prioritizing readability. The code is
-            split into files and everything is typed. Math operations are broken
-            out with helper functions like{" "}
+            {strings.about.diff1a}
+            <code className="text-foreground/80">microgpt-ts</code>
+            {strings.about.diff1b}
             <code className="text-foreground/80">dotProduct</code>,{" "}
-            <code className="text-foreground/80">transpose</code>, and{" "}
+            <code className="text-foreground/80">transpose</code>
+            {strings.about.diff1bAnd}
             <code className="text-foreground/80">mean</code>.
           </p>
 
           <p className="leading-relaxed text-muted-foreground">
-            The result is a reusable library packaged as a module, not a
-            standalone script. The playground imports it directly. And because
-            it&apos;s TypeScript, it runs natively in the browser with no Python
-            runtime or backend required.
+            {strings.about.diff2}
           </p>
         </div>
 
         <Separator />
 
         <div className="flex flex-col gap-3">
-          <h2 className="text-xl font-semibold">Credits</h2>
+          <h2 className="text-xl font-semibold">
+            {strings.about.creditsTitle}
+          </h2>
 
           <p className="leading-relaxed text-muted-foreground">
-            Inspired by Andrej Karpathy&apos;s{" "}
+            {strings.about.creditsInspired}{" "}
             <Link
               href="https://karpathy.github.io/2026/02/12/microgpt/"
               target="_blank"
@@ -191,11 +185,11 @@ export default function AboutPage() {
             >
               microgpt
             </Link>
-            .
+            {strings.about.creditsInspiredEnd}.
           </p>
 
           <p className="text-muted-foreground">
-            Built by{" "}
+            {strings.about.creditsBuilt}{" "}
             <Link
               href="https://github.com/dubzdubz"
               target="_blank"
@@ -204,7 +198,7 @@ export default function AboutPage() {
             >
               @dubzdubz
             </Link>
-            . Source on{" "}
+            {strings.about.creditsSource}{" "}
             <Link
               href="https://github.com/dubzdubz/microgpt-ts"
               target="_blank"

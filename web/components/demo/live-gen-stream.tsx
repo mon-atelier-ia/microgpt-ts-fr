@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 import { SECTION_LABEL } from "./types";
 
@@ -23,14 +24,14 @@ export function LiveGenStream({
 
   return (
     <div className={cn("flex flex-col gap-2 min-h-0", className)}>
-      <p className={SECTION_LABEL}>Live samples</p>
+      <p className={SECTION_LABEL}>{strings.liveStream.title}</p>
       <div
         ref={scrollRef}
         className="flex-1 min-h-0 overflow-y-auto rounded-lg border bg-muted/30 p-3"
       >
         {entries.length === 0 && (
           <p className="text-xs text-muted-foreground/50 font-mono">
-            Waiting for samples…
+            {strings.liveStream.waiting}
           </p>
         )}
         {entries.map((entry) => (
@@ -39,7 +40,7 @@ export function LiveGenStream({
             className="flex gap-3 font-mono text-xs leading-relaxed"
           >
             <span className="shrink-0 text-muted-foreground/50 tabular-nums">
-              Step {entry.step}
+              {strings.liveStream.step} {entry.step}
             </span>
             <span className="text-muted-foreground">—</span>
             <span>{entry.words.join(" · ")}</span>
