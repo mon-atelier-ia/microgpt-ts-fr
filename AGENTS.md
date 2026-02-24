@@ -51,3 +51,29 @@ pnpm vitest       # Run unit tests
 ## microgpt lib
 
 Follow Karpathy's style: keep code compact and simple. Prefer plain arrays and indexOf over Maps, simple loops over abstractions, and minimal intermediate variables. The code should read almost like pseudocode.
+
+
+## Project: microgpt-ts-fr
+
+### Context
+- Clone of dubzdubz/microgpt-ts, adapted for French UI and datasets
+- Solo developer (pierrealexandreguillemin-a11y)
+- Target deployment: microgpt-ts-fr.vercel.app
+
+### Git Rules — STRICT
+- NEVER run `git push` without explicit user request
+- NEVER run any `gh pr` command (no PR creation, no PR management)
+- NEVER run destructive git commands (force push, reset --hard, etc.)
+- Work is LOCAL ONLY: edits, commits, lint. User decides when to push.
+
+### Environment
+- Node 24 (see .nvmrc)
+- pnpm as package manager
+- Husky pre-commit: lint-staged (Biome check on staged files)
+- Husky pre-push: build + tests must pass
+
+### Scripts
+```bash
+pnpm check        # Full validation: lint + build + tests
+pnpm lint:fix     # Auto-fix formatting before commit
+```

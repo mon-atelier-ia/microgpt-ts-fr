@@ -1,3 +1,42 @@
+# microgpt-ts-fr
+
+Fork francais de [dubzdubz/microgpt-ts](https://github.com/dubzdubz/microgpt-ts) — un GPT complet construit from scratch en TypeScript, sans aucune dependance runtime. Fonctionne dans le navigateur.
+
+## Ce que ce fork ajoute
+
+- Interface utilisateur traduite en francais
+- Datasets supplementaires : prenoms francais, dinosaures, pokemon FR
+- Hooks git (Husky) : lint au commit, build + tests au push
+
+**Playground en ligne : [microgpt-ts-fr.vercel.app](https://microgpt-ts-fr.vercel.app/)**
+
+## Demarrage rapide
+
+**Prerequis :** [Node.js](https://nodejs.org/) (v24+) et [pnpm](https://pnpm.io/)
+
+```bash
+git clone https://github.com/pierrealexandreguillemin-a11y/microgpt-ts-fr.git
+cd microgpt-ts-fr
+pnpm install
+cd web && pnpm install
+pnpm dev
+```
+
+## Scripts
+
+```bash
+pnpm check         # Validation complete : lint + build + tests
+pnpm lint:fix      # Auto-fix formatage
+pnpm dev           # Serveur de dev (localhost:3000)
+pnpm build:web     # Build de production
+```
+
+---
+
+*Ce qui suit est le README original du projet upstream.*
+
+---
+
 # microgpt-ts
 
 A TypeScript port of Andrej Karpathy's [microgpt](https://gist.github.com/karpathy/8627fe009c40f57531cb18360106ce95) — a complete GPT built from scratch with **zero runtime dependencies**. Supports training and inference.
