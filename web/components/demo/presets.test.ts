@@ -39,6 +39,17 @@ describe("PRESETS", () => {
       }
     }
   });
+
+  it("ids match dataset file names (kebab-case)", () => {
+    for (const preset of PRESETS) {
+      expect(preset.id).toMatch(/^[a-z]+(-[a-z]+)*$/);
+    }
+  });
+
+  it("first preset is a valid default for consumers", () => {
+    expect(PRESETS[0]).toBeDefined();
+    expect(PRESETS[0].words.length).toBeGreaterThan(0);
+  });
 });
 
 describe("CUSTOM_PRESET", () => {
