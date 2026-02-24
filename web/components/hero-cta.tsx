@@ -24,7 +24,7 @@ export function HeroCta() {
         render={
           // biome-ignore lint/a11y/useAnchorContent: children injected by Base UI render prop
           <a
-            href="https://github.com/dubzdubz/microgpt-ts"
+            href="https://github.com/mon-atelier-ia/microgpt-ts-fr"
             target="_blank"
             rel="noopener noreferrer"
           />

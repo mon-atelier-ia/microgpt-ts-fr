@@ -28,7 +28,7 @@ export default function AboutPage() {
           <p className="leading-relaxed text-muted-foreground">
             {strings.about.intro2a}
             <Link
-              href="https://github.com/dubzdubz/microgpt-ts"
+              href="https://github.com/mon-atelier-ia/microgpt-ts-fr"
               target="_blank"
               rel="noopener noreferrer"
               className="underline underline-offset-4 hover:text-foreground"
@@ -200,7 +200,7 @@ export default function AboutPage() {
             </Link>
             {strings.about.creditsSource}{" "}
             <Link
-              href="https://github.com/dubzdubz/microgpt-ts"
+              href="https://github.com/mon-atelier-ia/microgpt-ts-fr"
               target="_blank"
               rel="noopener noreferrer"
               className="underline underline-offset-4 hover:text-foreground"
