@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="fr" className={inter.variable} suppressHydrationWarning>
       <body className="flex h-screen flex-col overflow-hidden antialiased">
         <ThemeProvider
           attribute="class"
