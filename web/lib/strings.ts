@@ -95,9 +95,25 @@ export const strings = {
       title: "Movie Titles",
       description: "Real film titles with cinematic rhythm",
     },
+    prenoms: {
+      title: "Prénoms",
+      description: "50 prénoms classiques aux sonorités douces",
+    },
+    prenoms1k: {
+      title: "Prénoms (1k)",
+      description: "1000 prénoms français variés",
+    },
+    pokemonFr: {
+      title: "Pokémon FR",
+      description: "Noms français officiels des Pokémon",
+    },
+    dinosaures: {
+      title: "Dinosaures",
+      description: "1500+ noms de dinosaures, du Triassique au Crétacé",
+    },
     custom: {
-      title: "Custom",
-      description: "Paste your own word list",
+      title: "Personnalisé",
+      description: "Collez votre propre liste de mots",
     },
   },
   dataset: {

@@ -1,12 +1,16 @@
 import type { LucideIcon } from "lucide-react";
-import { Baby, Clapperboard, Martini, PenLine, Zap } from "lucide-react";
+import { Baby, Bone, Clapperboard, Martini, PenLine, Zap } from "lucide-react";
 import { strings } from "@/lib/strings";
 
 import { babyNames } from "../../../datasets/baby-names";
 import { babyNamesSimple } from "../../../datasets/baby-names-simple";
 import { cocktails } from "../../../datasets/cocktails";
+import { dinosaures } from "../../../datasets/dinosaures";
 import { movieTitles } from "../../../datasets/movie-titles";
 import { pokemon } from "../../../datasets/pokemon";
+import { pokemonFr } from "../../../datasets/pokemon-fr";
+import { prenoms } from "../../../datasets/prenoms";
+import { prenomsSimple } from "../../../datasets/prenoms-simple";
 
 export type Preset = {
   id: string;
@@ -63,6 +67,34 @@ export const PRESETS: Preset[] = [
   //   icon: ScrollText,
   //   words: lines(fortunes),
   // },
+  {
+    id: "prenoms-simple",
+    title: strings.presets.prenoms.title,
+    description: strings.presets.prenoms.description,
+    icon: Baby,
+    words: lines(prenomsSimple),
+  },
+  {
+    id: "prenoms",
+    title: strings.presets.prenoms1k.title,
+    description: strings.presets.prenoms1k.description,
+    icon: Baby,
+    words: lines(prenoms),
+  },
+  {
+    id: "pokemon-fr",
+    title: strings.presets.pokemonFr.title,
+    description: strings.presets.pokemonFr.description,
+    icon: Zap,
+    words: lines(pokemonFr),
+  },
+  {
+    id: "dinosaures",
+    title: strings.presets.dinosaures.title,
+    description: strings.presets.dinosaures.description,
+    icon: Bone,
+    words: lines(dinosaures),
+  },
 ];
 
 export const CUSTOM_PRESET: Preset = {
