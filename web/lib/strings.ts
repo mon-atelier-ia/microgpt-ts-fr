@@ -75,26 +75,6 @@ export const strings = {
     creditsSource: ". Code source sur",
   },
   presets: {
-    babyNames: {
-      title: "Baby Names",
-      description: "50 popular names with soft vowels",
-    },
-    babyNames1k: {
-      title: "Baby Names (1k)",
-      description: "1000 diverse names from around the world",
-    },
-    pokemon: {
-      title: "Pok\u00e9mon",
-      description: "Punchy sounds and iconic suffixes",
-    },
-    cocktails: {
-      title: "Cocktails",
-      description: "Classic cocktail and spirit names",
-    },
-    movieTitles: {
-      title: "Movie Titles",
-      description: "Real film titles with cinematic rhythm",
-    },
     prenoms: {
       title: "Prénoms",
       description: "50 prénoms classiques aux sonorités douces",
