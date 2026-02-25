@@ -127,7 +127,8 @@ export const variableName: string[] = [
 - NEVER run any `gh pr` command (no PR creation, no PR management)
 - NEVER run destructive git commands (force push, reset --hard, etc.)
 - Work is LOCAL ONLY: edits, commits, lint. User decides when to push.
-- NEVER modify upstream (dubzdubz/microgpt-ts) files in `datasets/` or `microgpt/` — these are read-only. Only add new files or modify files under `web/`.
+- NEVER push to upstream (dubzdubz/microgpt-ts). All modifications are on our fork only.
+- When modifying files originally from upstream (`microgpt/`, `datasets/`), document divergences in `docs/fork-changes.md`.
 
 ### Environment
 - Node 24 (see .nvmrc)
