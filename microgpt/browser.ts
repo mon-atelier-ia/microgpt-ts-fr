@@ -87,5 +87,5 @@ export type TrainWorkerOut =
       type: "error";
       code: "nan-divergence";
       step: number;
-      lastValidLoss: number;
+      lastValidLoss: number | undefined;
     };

@@ -92,8 +92,20 @@ User clicks "Train"
   → train-worker.ts: buildTokenizer → initStateDict → runTraining()
     → chunked loop: trainStep() → post("steps") / post("live-gen") / post("eval-snapshot")
     → eval-worker.ts receives snapshots, returns avgLoss
+    → if loss is NaN → post("error", "nan-divergence") → stop immediately
+    → if training ends with high loss → post("warning", "high-loss")
   → post("done")
-  → demo.tsx sets status = "trained"
+  → demo.tsx sets status = "trained" | "diverged"
+
+  Error path (NaN):
+    → worker posts "error" → demo.tsx terminateWorkers() + setStatus("diverged")
+    → train-tab.tsx shows red pedagogical encart (what is NaN, why it happened, what to do)
+    → "Ré-entraîner" visible, "Générer →" hidden
+
+  Warning path (high loss):
+    → worker posts "warning" before "done" → demo.tsx stores trainingWarning
+    → train-tab.tsx shows amber encart (limited learning, suggestions)
+    → generation still available (model is usable but degraded)
 
 User clicks "Generate"
   → demo.tsx sends { type: "generate" | "explore-start" }

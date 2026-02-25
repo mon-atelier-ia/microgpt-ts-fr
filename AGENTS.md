@@ -91,7 +91,7 @@ export const variableName: string[] = [
 |---|---|---|
 | `prenoms-simple.ts` | 50 | INSEE 2024 national, top 50 by all-time births |
 | `prenoms.ts` | 1,000 | INSEE 2024 national, top 1000 by all-time births |
-| `dinosaures.ts` | 1,522 | github.com/Dvelezs94 via tuto-llm |
+| `dinosaures.ts` | 1,530 | github.com/Dvelezs94 via tuto-llm |
 | `pokemon-fr.ts` | 1,022 | PokeAPI FR names via tuto-llm |
 
 ### English datasets (upstream)

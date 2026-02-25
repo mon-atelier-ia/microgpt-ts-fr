@@ -31,8 +31,8 @@
 
 | Change | Commit | Justification |
 |--------|--------|---------------|
-| NaN divergence detection + pedagogical UI feedback | *(pending)* | When model diverges, explain what happened and why, instead of showing empty outputs silently |
-| High-loss warning with educational guidance | *(pending)* | When training barely converges, guide the user to experiment and adjust |
+| NaN divergence detection + pedagogical UI feedback | `6a33442` | When model diverges, explain what happened and why, instead of showing empty outputs silently |
+| High-loss warning with educational guidance | `6a33442` | When training barely converges, guide the user to experiment and adjust |
 
 ## Infrastructure
 

@@ -54,7 +54,7 @@ function runTraining(
   const encodedEvalDocs = evalDocs.map((d) => tok.encode(d));
   let smoothLoss: number | undefined;
   let initialLoss: number | undefined;
-  let lastValidLoss = 0;
+  let lastValidLoss: number | undefined;
   let evalId = 0;
   let step = 0;
   const stepBatch: { step: number; smoothLoss: number }[] = [];

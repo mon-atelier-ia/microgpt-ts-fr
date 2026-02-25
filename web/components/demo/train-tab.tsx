@@ -66,8 +66,8 @@ export function TrainTab({
       )}
 
       {trainingWarning === "high-loss" && status === "trained" && (
-        <div className="flex flex-col gap-2 rounded-lg border border-yellow-500/50 bg-yellow-500/5 p-4">
-          <div className="flex items-center gap-2 font-medium text-yellow-600 dark:text-yellow-500">
+        <div className="flex flex-col gap-2 rounded-lg border border-warning/50 bg-warning/5 p-4">
+          <div className="flex items-center gap-2 font-medium text-warning">
             <AlertTriangle className="h-4 w-4" />
             {s.highLossTitle}
           </div>
