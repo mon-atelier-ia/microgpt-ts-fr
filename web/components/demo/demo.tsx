@@ -123,6 +123,7 @@ export function TrainDemo() {
     setExploreSteps([]);
     setExploreDone(false);
     setIsGenerating(false);
+    setTrainingWarning(null);
     lossBufferRef.current = [];
     evalStepMapRef.current = {};
 
@@ -196,6 +197,15 @@ export function TrainDemo() {
 
         case "gen-done":
           setIsGenerating(false);
+          break;
+
+        case "error":
+          terminateWorkers();
+          setStatus("diverged");
+          break;
+
+        case "warning":
+          setTrainingWarning(msg.code);
           break;
 
         case "explore-step":
@@ -280,6 +290,7 @@ export function TrainDemo() {
   );
 
   const [isGenerating, setIsGenerating] = useState(false);
+  const [trainingWarning, setTrainingWarning] = useState<string | null>(null);
 
   const handleGenerate = useCallback(() => {
     if (!trainWorkerRef.current) return;
@@ -295,6 +306,7 @@ export function TrainDemo() {
 
   const isTraining = status === "training";
   const isTrained = status === "trained";
+  const isDiverged = status === "diverged";
 
   return (
     <div className="flex w-full max-w-5xl flex-1 flex-col min-h-0">
@@ -315,17 +327,21 @@ export function TrainDemo() {
             trainingConfig={trainingConfig}
             disabled={isTraining}
             isTraining={isTraining}
-            isTrained={isTrained}
+            isTrained={isTrained || isDiverged}
             onModelChange={setModelConfig}
             onTrainingChange={setTrainingConfig}
             onTrain={handleTrain}
             onStop={handleStop}
-            onSwitchToGenerate={() => {
-              setTab("generate");
-              setGenerateMode("explore");
-              handleResetExplore();
-              handleNextToken();
-            }}
+            onSwitchToGenerate={
+              isDiverged
+                ? undefined
+                : () => {
+                    setTab("generate");
+                    setGenerateMode("explore");
+                    handleResetExplore();
+                    handleNextToken();
+                  }
+            }
           />
         )}
         {tab === "generate" && (
@@ -378,6 +394,7 @@ export function TrainDemo() {
                 trainingConfig={trainingConfig}
                 lossHistory={lossHistory}
                 liveGenEntries={liveGenEntries}
+                trainingWarning={trainingWarning}
               />
             </div>
           )}

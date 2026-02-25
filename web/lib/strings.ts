@@ -101,6 +101,22 @@ export const strings = {
     trainButton: "Entra\u00eener sur ces donn\u00e9es",
     placeholder: "Entrez des mots, un par ligne\u2026",
   },
+  trainDiag: {
+    nanTitle: "Le modèle a divergé",
+    nanBullet1:
+      "NaN signifie « Not a Number » — le résultat d'un calcul impossible (\u221e \u2212 \u221e, 0/0\u2026).",
+    nanBullet2:
+      "Cause probable\u00a0: le learning rate est trop élevé. Les mises à jour des poids deviennent trop grandes, les valeurs explosent.",
+    nanBullet3:
+      "C'était prévisible\u00a0: un learning rate élevé sur un grand dataset cause classiquement cette divergence.",
+    nanAction:
+      "Réduisez le learning rate (essayez \u00d710 plus bas) et ré-entraînez.",
+    highLossTitle: "Apprentissage limité",
+    highLossBody:
+      "La perte finale reste proche de sa valeur initiale — le modèle n'a pas bien capté les patterns du dataset. Les sorties seront peu ressemblantes aux données.",
+    highLossAction:
+      "Expérimentez les sorties pour observer l'effet, puis essayez\u00a0: plus de pas, un modèle plus grand, ou un learning rate différent.",
+  },
   train: {
     model: "Mod\u00e8le",
     embeddingDim: "Dim. d\u2019embedding (embedding dim)",

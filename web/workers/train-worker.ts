@@ -53,6 +53,8 @@ function runTraining(
   const evalInterval = Math.max(1, Math.round(numSteps * 0.05));
   const encodedEvalDocs = evalDocs.map((d) => tok.encode(d));
   let smoothLoss: number | undefined;
+  let initialLoss: number | undefined;
+  let lastValidLoss = 0;
   let evalId = 0;
   let step = 0;
   const stepBatch: { step: number; smoothLoss: number }[] = [];
@@ -64,7 +66,18 @@ function runTraining(
       const doc = trainDocs[step % trainDocs.length];
       const tokens = tok.encode(doc);
       const info = trainStep(sd, as, tokens, step, numSteps, adamCfg, mc);
+      if (Number.isNaN(info.loss)) {
+        post({
+          type: "error",
+          code: "nan-divergence",
+          step: step + 1,
+          lastValidLoss,
+        });
+        return;
+      }
       smoothLoss = emaSmooth(smoothLoss, info.loss);
+      if (initialLoss === undefined) initialLoss = smoothLoss;
+      lastValidLoss = smoothLoss;
       const s = step + 1;
 
       stepBatch.push({ step: s, smoothLoss: smoothLoss });
@@ -104,6 +117,18 @@ function runTraining(
     }
 
     if (step >= numSteps) {
+      if (
+        initialLoss !== undefined &&
+        smoothLoss !== undefined &&
+        smoothLoss > initialLoss * 0.7
+      ) {
+        post({
+          type: "warning",
+          code: "high-loss",
+          finalLoss: smoothLoss,
+          initialLoss,
+        });
+      }
       post({ type: "done", weights: snapshotWeights(sd) });
       return;
     }

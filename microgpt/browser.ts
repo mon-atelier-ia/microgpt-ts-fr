@@ -76,4 +76,16 @@ export type TrainWorkerOut =
   | { type: "done"; weights: NumericStateDict }
   | { type: "gen-word"; word: string }
   | { type: "gen-done" }
-  | { type: "explore-step"; step: InferenceStep };
+  | { type: "explore-step"; step: InferenceStep }
+  | {
+      type: "warning";
+      code: "high-loss";
+      finalLoss: number;
+      initialLoss: number;
+    }
+  | {
+      type: "error";
+      code: "nan-divergence";
+      step: number;
+      lastValidLoss: number;
+    };

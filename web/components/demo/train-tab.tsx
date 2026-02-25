@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react";
 import { strings } from "@/lib/strings";
 import type { LiveGenEntry } from "./live-gen-stream";
 import { LiveGenStream } from "./live-gen-stream";
@@ -16,6 +17,7 @@ export function TrainTab({
   trainingConfig,
   lossHistory,
   liveGenEntries,
+  trainingWarning,
 }: {
   status: Status;
   step: number;
@@ -25,8 +27,10 @@ export function TrainTab({
   trainingConfig: TrainingConfig;
   lossHistory: LossPoint[];
   liveGenEntries: LiveGenEntry[];
+  trainingWarning?: string | null;
 }) {
   const isTraining = status === "training";
+  const s = strings.trainDiag;
 
   if (status === "idle") {
     return (
@@ -45,6 +49,32 @@ export function TrainTab({
         evalLoss={evalLoss}
         elapsed={elapsed}
       />
+
+      {status === "diverged" && (
+        <div className="flex flex-col gap-2 rounded-lg border border-destructive/50 bg-destructive/5 p-4">
+          <div className="flex items-center gap-2 font-medium text-destructive">
+            <AlertTriangle className="h-4 w-4" />
+            {s.nanTitle}
+          </div>
+          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+            <li>{s.nanBullet1}</li>
+            <li>{s.nanBullet2}</li>
+            <li>{s.nanBullet3}</li>
+          </ul>
+          <p className="text-sm font-medium">{s.nanAction}</p>
+        </div>
+      )}
+
+      {trainingWarning === "high-loss" && status === "trained" && (
+        <div className="flex flex-col gap-2 rounded-lg border border-yellow-500/50 bg-yellow-500/5 p-4">
+          <div className="flex items-center gap-2 font-medium text-yellow-600 dark:text-yellow-500">
+            <AlertTriangle className="h-4 w-4" />
+            {s.highLossTitle}
+          </div>
+          <p className="text-sm text-muted-foreground">{s.highLossBody}</p>
+          <p className="text-sm font-medium">{s.highLossAction}</p>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2 flex-[3] min-h-0">
         <p className={SECTION_LABEL}>{strings.train.loss}</p>

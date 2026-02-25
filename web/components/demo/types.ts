@@ -1,4 +1,4 @@
-export type Status = "idle" | "training" | "trained";
+export type Status = "idle" | "training" | "trained" | "diverged";
 export type GenerateMode = "batch" | "explore";
 
 export const SECTION_LABEL =

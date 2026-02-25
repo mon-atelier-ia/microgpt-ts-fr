@@ -28,7 +28,7 @@ type TrainSidebarProps = {
   onTrainingChange: (c: TrainingConfig) => void;
   onTrain: () => void;
   onStop: () => void;
-  onSwitchToGenerate: () => void;
+  onSwitchToGenerate?: () => void;
 };
 
 const LR_MIN = 0.001;
@@ -251,7 +251,7 @@ export function TrainSidebar({
             {isTrained ? strings.train.retrain : strings.train.trainBtn}
           </Button>
         )}
-        {isTrained && (
+        {isTrained && onSwitchToGenerate && (
           <Button
             variant="outline"
             onClick={onSwitchToGenerate}
