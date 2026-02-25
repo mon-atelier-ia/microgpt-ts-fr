@@ -25,7 +25,7 @@ describe("PRESETS", () => {
     ["prenoms-simple", 50],
     ["prenoms", 1000],
     ["pokemon-fr", 1022],
-    ["dinosaures", 1522],
+    ["dinosaures", 1530],
   ] as const)("preset %s has %d words", (id, count) => {
     const preset = PRESETS.find((p) => p.id === id);
     expect(preset).toBeDefined();

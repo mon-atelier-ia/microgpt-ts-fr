@@ -1,11 +1,16 @@
 import type { LucideIcon } from "lucide-react";
 import { Baby, Bone, PenLine, Zap } from "lucide-react";
 import { strings } from "@/lib/strings";
-
 import { dinosaures } from "../../../datasets/dinosaures";
 import { pokemonFr } from "../../../datasets/pokemon-fr";
 import { prenoms } from "../../../datasets/prenoms";
 import { prenomsSimple } from "../../../datasets/prenoms-simple";
+import type { ModelConfig } from "../../../microgpt/model";
+
+export type PresetTrainingConfig = {
+  learningRate?: number;
+  numSteps?: number;
+};
 
 export type Preset = {
   id: string;
@@ -13,6 +18,8 @@ export type Preset = {
   description: string;
   icon: LucideIcon;
   words: string;
+  modelConfig?: Partial<ModelConfig>;
+  trainingConfig?: PresetTrainingConfig;
 };
 
 export const CUSTOM_PRESET_ID = "custom";
@@ -26,6 +33,7 @@ export const PRESETS: Preset[] = [
     description: strings.presets.prenoms.description,
     icon: Baby,
     words: lines(prenomsSimple),
+    trainingConfig: { learningRate: 0.001 },
   },
   {
     id: "prenoms",
@@ -47,6 +55,8 @@ export const PRESETS: Preset[] = [
     description: strings.presets.dinosaures.description,
     icon: Bone,
     words: lines(dinosaures),
+    modelConfig: { nEmbd: 32, blockSize: 32, nLayer: 2 },
+    trainingConfig: { numSteps: 3000 },
   },
 ];
 

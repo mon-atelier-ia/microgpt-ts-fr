@@ -15,7 +15,7 @@ import { GenerateSidebar } from "./generate-sidebar";
 import { GenerateTab } from "./generate-tab";
 import type { LiveGenEntry } from "./live-gen-stream";
 import type { LossPoint } from "./loss-chart";
-import { CUSTOM_PRESET_ID, PRESETS } from "./presets";
+import { CUSTOM_PRESET_ID, PRESETS, type Preset } from "./presets";
 import { type TrainingConfig, TrainSidebar } from "./train-sidebar";
 import { TrainTab } from "./train-tab";
 import type { GenerateMode, Status } from "./types";
@@ -55,7 +55,7 @@ export function TrainDemo() {
 
   const [modelConfig, setModelConfig] = useState<ModelConfig>(DEFAULT_CONFIG);
   const [trainingConfig, setTrainingConfig] = useState<TrainingConfig>({
-    learningRate: 0.01,
+    learningRate: 0.001,
     numSteps: 1000,
   });
   const [temperature, setTemperature] = useState(0.5);
@@ -70,6 +70,17 @@ export function TrainDemo() {
   const wordCount = datasetText
     .split("\n")
     .filter((l) => l.trim().length > 0).length;
+
+  const handlePresetSelect = useCallback((id: string) => {
+    setSelectedPresetId(id);
+    const preset: Preset | undefined = PRESETS.find((p) => p.id === id);
+    setModelConfig({ ...DEFAULT_CONFIG, ...preset?.modelConfig });
+    setTrainingConfig({
+      learningRate: 0.001,
+      numSteps: 1000,
+      ...preset?.trainingConfig,
+    });
+  }, []);
 
   const trainWorkerRef = useRef<Worker | null>(null);
   const evalWorkerRef = useRef<Worker | null>(null);
@@ -294,7 +305,7 @@ export function TrainDemo() {
             selectedId={selectedPresetId}
             disabled={isTraining}
             wordCount={wordCount}
-            onSelect={setSelectedPresetId}
+            onSelect={handlePresetSelect}
             onTrain={handleTrain}
           />
         )}
