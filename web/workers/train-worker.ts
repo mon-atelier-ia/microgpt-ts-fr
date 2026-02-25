@@ -120,7 +120,7 @@ function runTraining(
       if (
         initialLoss !== undefined &&
         smoothLoss !== undefined &&
-        smoothLoss > initialLoss * 0.7
+        smoothLoss > initialLoss * 0.85
       ) {
         post({
           type: "warning",

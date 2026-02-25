@@ -41,8 +41,6 @@ export const PRESETS: Preset[] = [
     description: strings.presets.prenoms1k.description,
     icon: Baby,
     words: lines(prenoms),
-    modelConfig: { nEmbd: 32, blockSize: 32 },
-    trainingConfig: { numSteps: 2000 },
   },
   {
     id: "pokemon-fr",
@@ -50,8 +48,6 @@ export const PRESETS: Preset[] = [
     description: strings.presets.pokemonFr.description,
     icon: Zap,
     words: lines(pokemonFr),
-    modelConfig: { nEmbd: 32, blockSize: 32 },
-    trainingConfig: { numSteps: 2000 },
   },
   {
     id: "dinosaures",
@@ -59,8 +55,6 @@ export const PRESETS: Preset[] = [
     description: strings.presets.dinosaures.description,
     icon: Bone,
     words: lines(dinosaures),
-    modelConfig: { nEmbd: 32, blockSize: 32 },
-    trainingConfig: { numSteps: 2500 },
   },
 ];
 
