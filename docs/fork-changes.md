@@ -24,7 +24,8 @@
 | Change | Commit | Justification |
 |--------|--------|---------------|
 | Default learning rate 0.01 → 0.001 | `229300f` | Upstream 0.01 causes NaN divergence on larger FR datasets. Safer UX default — avoids "app broken" perception on first use |
-| Per-preset model/training configs | `229300f` | Different datasets need different hyperparameters. Dinosaures (1530 entries, long names) needs `nEmbd=32, blockSize=32, nLayer=2, numSteps=3000`. Without this, large datasets diverge with default tiny model |
+| Per-preset model/training configs | `229300f` | Different datasets need different hyperparameters. Large datasets (1000+ entries) need `nEmbd=32, blockSize=32, nLayer=2, numSteps=3000`. Without this, default tiny model + 1000 steps cannot converge |
+| Add preset configs for Prénoms 1k and Pokémon FR | *(pending)* | 1022/1000 words with default 1000 steps = ~1 epoch = guaranteed "Apprentissage limité" even with model maxed out. Pedagogically catastrophic |
 | `handlePresetSelect` merges preset configs on switch | `229300f` | Upstream uses `learningRate: 0.01` in merge; we use `0.001` (intentional, see above) |
 
 ## Pedagogical Features
