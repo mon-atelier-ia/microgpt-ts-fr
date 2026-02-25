@@ -5,7 +5,6 @@ dist
 !.env.example
 
 # local files
-docs/
 tmp/
 
 # next.js
