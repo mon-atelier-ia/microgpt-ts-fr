@@ -8,9 +8,8 @@
 ## Documentation
 
 Project documentation lives in docs/. Use it extensively.
-In particular:
-- docs/style-guide.md — code style, Biome rules, naming conventions, TypeScript & React patterns
-- docs/ui-guide.md — UI principles, shadcn-first approach, adding components, design guidelines
+<!-- TODO: create docs/style-guide.md (code style, Biome rules, naming conventions, TypeScript & React patterns) -->
+<!-- TODO: create docs/ui-guide.md (UI principles, shadcn-first approach, adding components, design guidelines) -->
 
 
 ## Web App (`web/`)
