@@ -83,6 +83,77 @@ TypeScript files exporting `string[]`. Lowercase a-z only, sorted alphabetically
 | `fetch-baby-names.ts` | Data fetcher for baby names dataset |
 | `fetch-movie-titles.ts` | Data fetcher for movie titles dataset |
 
+## Frontend ← Model API surface
+
+The frontend never calls model functions directly on the main thread. All heavy computation runs in Web Workers. The main thread only imports **types** for type-safety.
+
+### `microgpt/model.ts`
+
+| Export | Kind | Consumers |
+|--------|------|-----------|
+| `ModelConfig` | type | `demo.tsx`, `presets.ts`, `train-sidebar.tsx`, `eval-worker.ts`, `train-worker.ts` |
+| `DEFAULT_CONFIG` | const | `train-worker.ts` |
+| `StateDict` | type | `train-worker.ts` |
+| `Tokenizer` | type | `train-worker.ts` |
+| `buildTokenizer` | fn | `train-worker.ts` |
+| `initStateDict` | fn | `train-worker.ts` |
+| `getParams` | fn | `train-worker.ts` |
+| `forward` | fn | `eval-worker.ts`, `train-worker.ts` |
+| `InferenceStep` | type | `demo.tsx`, `explore-view.tsx`, `generate-tab.tsx`, `explore-view.stories.tsx` |
+| `inferenceStepwise` | fn | `train-worker.ts` |
+| `inference` | fn | `train-worker.ts` |
+
+### `microgpt/browser.ts`
+
+Serialization layer: converts `Value` objects ↔ plain numbers for Worker `postMessage`.
+
+| Export | Kind | Consumers |
+|--------|------|-----------|
+| `TrainWorkerIn` | type | `demo.tsx` |
+| `TrainWorkerOut` | type | `demo.tsx`, `eval-worker.ts`, `train-worker.ts` |
+| `NumericStateDict` | type | `eval-worker.ts`, `train-worker.ts` |
+| `snapshotWeights` | fn | `train-worker.ts` |
+| `restoreStateDict` | fn | `eval-worker.ts`, `train-worker.ts` |
+
+### `microgpt/train.ts`
+
+| Export | Kind | Consumers |
+|--------|------|-----------|
+| `AdamConfig` | type | `train-worker.ts` |
+| `DEFAULT_ADAM_CONFIG` | const | `train-worker.ts` |
+| `AdamState` | type | `train-worker.ts` |
+| `StepInfo` | type | `train-worker.ts` |
+| `initAdamState` | fn | `train-worker.ts` |
+| `trainStep` | fn | `train-worker.ts` |
+
+### `microgpt/utils.ts`
+
+| Export | Kind | Consumers |
+|--------|------|-----------|
+| `emaSmooth` | fn | `train-worker.ts` |
+| `parseDocs` | fn | `train-worker.ts` |
+| `splitDocs` | fn | `train-worker.ts` |
+
+### `microgpt/value.ts`
+
+Not imported directly by any frontend file. Consumed indirectly via `model.ts` and `browser.ts`.
+
+### Import boundaries
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Main thread (demo.tsx, UI components)                  │
+│  Imports: types only (ModelConfig, InferenceStep,       │
+│           TrainWorkerIn, TrainWorkerOut)                 │
+└────────────────────┬────────────────────────────────────┘
+                     │ postMessage (structured clone)
+┌────────────────────▼────────────────────────────────────┐
+│  Workers (train-worker.ts, eval-worker.ts)              │
+│  Imports: all functions + types from microgpt/*          │
+│  browser.ts converts Value ↔ number at the boundary     │
+└─────────────────────────────────────────────────────────┘
+```
+
 ## Data flow
 
 ```
